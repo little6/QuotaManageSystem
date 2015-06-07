@@ -480,6 +480,29 @@ if(datas.current){&#xD;
                     <Property name="icon">url(>skin>common/icons.gif) -200px 0px</Property>
                   </ToolBarButton>
                   <Separator/>
+                  <ToolBarButton>
+                    <ClientEvent name="onClick">var dtrDepartment=view.get(&quot;#dtrDepartment&quot;);&#xD;
+var currentDepartment=dtrDepartment.get(&quot;currentEntity&quot;);&#xD;
+var manageDeptId=currentDepartment.get(&quot;id&quot;);&#xD;
+var aaCreateQuotaItemCreatorsByTopCover = view.get(&quot;#aaCreateQuotaItemCreatorsByTopCover&quot;);&#xD;
+var dsQuotaItemCreator=view.get(&quot;#dsQuotaItemCreator&quot;);&#xD;
+var dgQuotaItemCreator=view.get(&quot;#dgQuotaItemCreator&quot;);&#xD;
+&#xD;
+aaCreateQuotaItemCreatorsByTopCover.set(&quot;parameter&quot;,{manageDeptId:manageDeptId});&#xD;
+aaCreateQuotaItemCreatorsByTopCover.execute({&#xD;
+    callback: function(success,obj){&#xD;
+        if (success) {&#xD;
+			dsQuotaItemCreator.set(&quot;parameter&quot;,{manageDeptId:manageDeptId}).flush();&#xD;
+        }        &#xD;
+		else {&#xD;
+            //alert(&quot;初始化指标生成器 失败！发生异常：&quot; + obj);&#xD;
+        }   &#xD;
+	}&#xD;
+});</ClientEvent>
+                    <Property name="caption">指标全口径初始化</Property>
+                    <Property name="tip">部门在用指标种类以全口径的方式进行初始化，该操作仅对未进行全口径初始化的指标种类有效。</Property>
+                    <Property name="icon">url(>skin>common/icons.gif) -220px -100px</Property>
+                  </ToolBarButton>
                   <MenuButton>
                     <Property name="caption">指标生成</Property>
                     <Property name="icon">url(>skin>common/icons.gif) -182px -121px</Property>

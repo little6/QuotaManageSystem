@@ -122,15 +122,8 @@ public class QuotaTypeDao extends HibernateDao {
 	}
 	
 	@DataProvider
-	public Collection<QuotaType> getQuotaTypesInUsedByLoginUserDept(){
-		String hqlString = "from " + QuotaType.class.getName()+" where inUsed=true";
-		IUser loginUser = ContextHolder.getLoginUser();
-		if (loginUser.isAdministrator()) {
-			
-		}else {
-			List<IDept> iDepts=loginUser.getDepts();
-			hqlString = "from " + QuotaType.class.getName()+" where inUsed=true and manageDept.id='"+iDepts.get(0).getId()+"'";
-		}
+	public Collection<QuotaType> getQuotaTypesInUsedManageDept(String manageDeptId){
+		String hqlString = "from " + QuotaType.class.getName()+" where inUsed=true and manageDept.id='"+manageDeptId+"'";
 		Collection<QuotaType> quotaTypes = this.query(hqlString);
 		return quotaTypes;
 	}
@@ -341,14 +334,11 @@ public class QuotaTypeDao extends HibernateDao {
 							String sqlString2="delete from default_view_quota_type where QUOTA_TYPE_ID='"+quotaType.getId()+"'";
 							excuteSQL(sqlString1);
 							excuteSQL(sqlString2);
-						}
-					}
-					
-					//在用状态变更
-					if ((quotaType.isInUsed())==false) {
-						Collection<QuotaItemCreator> quotaItemCreators=quotaItemCreatorDao.getQuotaItemCreatorsByQuotaType(oldQuotaType.getId());
-						if (quotaItemCreators.size()>0) {
-							quotaItemCreatorDao.deleteQuotaItemCreators(quotaItemCreators);
+							
+							Collection<QuotaItemCreator> quotaItemCreators=quotaItemCreatorDao.getQuotaItemCreatorsByQuotaType(oldQuotaType.getId());
+							if (quotaItemCreators.size()>0) {
+								quotaItemCreatorDao.deleteQuotaItemCreators(quotaItemCreators);
+							}
 						}
 					}
 					

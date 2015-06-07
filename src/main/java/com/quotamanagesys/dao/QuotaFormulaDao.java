@@ -16,10 +16,11 @@ import com.bstek.dorado.annotation.DataProvider;
 import com.bstek.dorado.annotation.DataResolver;
 import com.bstek.dorado.data.entity.EntityState;
 import com.bstek.dorado.data.entity.EntityUtils;
-import com.bstek.dorado.view.widget.base.Dialog;
-import com.bstek.dorado.view.widget.base.Tip;
+import com.quotamanagesys.interceptor.CalculateCore;
+import com.quotamanagesys.interceptor.ResultTableCreator;
 import com.quotamanagesys.model.QuotaFormula;
 import com.quotamanagesys.model.QuotaFormulaResult;
+import com.quotamanagesys.model.QuotaItem;
 import com.quotamanagesys.model.QuotaItemCreator;
 import com.quotamanagesys.model.QuotaTypeFormulaLink;
 
@@ -91,20 +92,26 @@ public class QuotaFormulaDao extends HibernateDao {
 	public void saveQuotaFormulas(Collection<QuotaFormula> quotaFormulas,String quotaFormulaResultId){
 		Session session=this.getSessionFactory().openSession();
 		QuotaFormulaResult quotaFormulaResult=quotaFormulaResultDao.getFormulaResult(quotaFormulaResultId);
+		ArrayList<QuotaItem> updateQuotaItems=new ArrayList<QuotaItem>();
 		try {
 			for (QuotaFormula quotaFormula : quotaFormulas) {
 				EntityState state=EntityUtils.getState(quotaFormula);
 				if (state.equals(EntityState.NEW)) {
 					quotaFormula.setQuotaFormulaResult(quotaFormulaResult);
 					session.merge(quotaFormula);
+					session.flush();
+					session.clear();
 				}else if (state.equals(EntityState.MODIFIED)) {
 					quotaFormula.setQuotaFormulaResult(quotaFormulaResult);
 					session.merge(quotaFormula);
+					session.flush();
+					session.clear();
 				}else if (state.equals(EntityState.DELETED)) {
 					quotaFormula.setQuotaFormulaResult(null);
 					session.delete(quotaFormula);
 				}
 			}
+
 		} catch (Exception e) {
 			System.out.print(e.toString());
 		}finally{

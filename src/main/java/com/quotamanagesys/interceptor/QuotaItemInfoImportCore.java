@@ -1,5 +1,6 @@
 package com.quotamanagesys.interceptor;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -110,22 +111,24 @@ public class QuotaItemInfoImportCore extends HibernateDao{
 						boolean isWantToBeCalculated=false;
 						boolean isCanUpdate=true;
 						QuotaItem quotaItem=quotaItems.get(0);
+						int digit=quotaItem.getQuotaItemCreator().getQuotaType().getDigit();
 
 						if (rs.getString("finishValue")!=null) {
 							boolean isAvailable=true;
+							String finishValue = null;
 							try {
-								double finishValue=Double.parseDouble(rs.getString("finishValue"));
+								finishValue=new BigDecimal(Double.parseDouble(rs.getString("finishValue"))).setScale(digit, BigDecimal.ROUND_HALF_UP).doubleValue()+"";
 							} catch (NumberFormatException e) {
 								System.out.print(e.toString());
 								isAvailable=false;
 							}
 							if (isAvailable) {
 								if (quotaItem.getFinishValue()==null) {
-									quotaItem.setFinishValue(rs.getString("finishValue"));
+									quotaItem.setFinishValue(finishValue);
 									isWantToBeCalculated=true;
 								}else {
-									if (!quotaItem.getFinishValue().equals(rs.getString("finishValue"))) {
-										quotaItem.setFinishValue(rs.getString("finishValue"));
+									if (!quotaItem.getFinishValue().equals(finishValue)) {
+										quotaItem.setFinishValue(finishValue);
 										isWantToBeCalculated=true;
 									}
 								}
@@ -139,19 +142,20 @@ public class QuotaItemInfoImportCore extends HibernateDao{
 						
 						if (rs.getString("accumulateValue")!=null) {
 							boolean isAvailable=true;
+							String accumulateValue=null;
 							try {
-								double accumulateValue=Double.parseDouble(rs.getString("accumulateValue"));
+								accumulateValue=new BigDecimal(Double.parseDouble(rs.getString("accumulateValue"))).setScale(digit, BigDecimal.ROUND_HALF_UP).doubleValue()+"";
 							} catch (NumberFormatException e) {
 								System.out.print(e.toString());
 								isAvailable=false;
 							}
 							if (isAvailable) {
 								if (quotaItem.getAccumulateValue()==null) {
-									quotaItem.setAccumulateValue(rs.getString("accumulateValue"));
+									quotaItem.setAccumulateValue(accumulateValue);
 									isWantToBeCalculated=true;
 								} else {
-									if (!quotaItem.getAccumulateValue().equals(rs.getString("accumulateValue"))) {
-										quotaItem.setAccumulateValue(rs.getString("accumulateValue"));
+									if (!quotaItem.getAccumulateValue().equals(accumulateValue)) {
+										quotaItem.setAccumulateValue(accumulateValue);
 										isWantToBeCalculated=true;
 									}
 								}
@@ -165,19 +169,20 @@ public class QuotaItemInfoImportCore extends HibernateDao{
 
 						if (rs.getString("sameTermValue")!=null) {
 							boolean isAvailable=true;
+							String sameTermValue=null;
 							try {
-								double sameTermValue=Double.parseDouble(rs.getString("sameTermValue"));
+								sameTermValue=new BigDecimal(Double.parseDouble(rs.getString("sameTermValue"))).setScale(digit, BigDecimal.ROUND_HALF_UP).doubleValue()+"";
 							} catch (NumberFormatException e) {
 								System.out.print(e.toString());
 								isAvailable=false;
 							}
 							if (isAvailable) {
 								if (quotaItem.getSameTermValue()==null) {
-									quotaItem.setSameTermValue(rs.getString("sameTermValue"));
+									quotaItem.setSameTermValue(sameTermValue);
 									isWantToBeCalculated=true;
 								} else {
-									if (!quotaItem.getSameTermValue().equals(rs.getString("sameTermValue"))) {
-										quotaItem.setSameTermValue(rs.getString("sameTermValue"));
+									if (!quotaItem.getSameTermValue().equals(sameTermValue)) {
+										quotaItem.setSameTermValue(sameTermValue);
 										isWantToBeCalculated=true;
 									}
 								}
@@ -191,19 +196,20 @@ public class QuotaItemInfoImportCore extends HibernateDao{
 
 						if (rs.getString("sameTermAccumulateValue")!=null) {
 							boolean isAvailable=true;
+							String sameTermAccumulateValue=null;
 							try {
-								double sameTermAccumulateValue=Double.parseDouble(rs.getString("sameTermAccumulateValue"));
+								sameTermAccumulateValue=new BigDecimal(Double.parseDouble(rs.getString("sameTermAccumulateValue"))).setScale(digit, BigDecimal.ROUND_HALF_UP).doubleValue()+"";
 							} catch (NumberFormatException e) {
 								System.out.print(e.toString());
 								isAvailable=false;
 							}
 							if (isAvailable) {
 								if (quotaItem.getSameTermAccumulateValue()==null) {
-									quotaItem.setSameTermAccumulateValue(rs.getString("sameTermAccumulateValue"));
+									quotaItem.setSameTermAccumulateValue(sameTermAccumulateValue);
 									isWantToBeCalculated=true;
 								} else {
-									if (!quotaItem.getSameTermAccumulateValue().equals(rs.getString("sameTermAccumulateValue"))) {
-										quotaItem.setSameTermAccumulateValue(rs.getString("sameTermAccumulateValue"));
+									if (!quotaItem.getSameTermAccumulateValue().equals(sameTermAccumulateValue)) {
+										quotaItem.setSameTermAccumulateValue(sameTermAccumulateValue);
 										isWantToBeCalculated=true;
 									}
 								}

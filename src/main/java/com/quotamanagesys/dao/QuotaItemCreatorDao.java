@@ -346,9 +346,9 @@ public class QuotaItemCreatorDao extends HibernateDao {
 
 	//根据指标种类库中的当前在用指标初始化当年口径为顶级口径的指标生成器
 	@Expose
-	public void createQuotaItemCreatorsByTopCover(){
+	public void createQuotaItemCreatorsByTopCover(String manageDeptId){
 		QuotaCover topQuotaCover=quotaCoverDao.getTopQuotaCovers().get(0);
-		Collection<QuotaType> quotaTypesInUsed=quotaTypeDao.getQuotaTypesInUsedByLoginUserDept();
+		Collection<QuotaType> quotaTypesInUsed=quotaTypeDao.getQuotaTypesInUsedManageDept(manageDeptId);
 		
 		Calendar calendar=Calendar.getInstance();	
 		//获取执行时的年月

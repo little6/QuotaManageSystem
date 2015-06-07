@@ -8,7 +8,9 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.hibernate.Session;
+import org.nfunk.jep.ASTFunNode;
 import org.nfunk.jep.JEP;
+import org.nfunk.jep.type.Complex;
 import org.springframework.stereotype.Component;
 
 import com.bstek.bdf2.core.orm.hibernate.HibernateDao;
@@ -24,6 +26,7 @@ import com.quotamanagesys.model.QuotaItemCreator;
 import com.quotamanagesys.model.QuotaPropertyValue;
 import com.quotamanagesys.model.QuotaTargetValue;
 import com.quotamanagesys.model.QuotaType;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 
 @Component
 public class CalculateCore extends HibernateDao{
@@ -60,39 +63,43 @@ public class CalculateCore extends HibernateDao{
 		QuotaItemCreator quotaItemCreator=quotaItem.getQuotaItemCreator();
 		QuotaType quotaType=quotaItemCreator.getQuotaType();
 		int digit=quotaType.getDigit();
-		//构建计算器
-		JEP jep=new JEP();
+		
 		Set<QuotaFormula> quotaFormulas=quotaItemCreator.getQuotaFormulas();
 		Collection<CalculateParameter> calculateParameters=getCalculateParametersByQuotaItem(quotaItem.getId());
-		if (calculateParameters.size()>0) {
-			for (CalculateParameter calculateParameter : calculateParameters) {
-				jep.addVariable(calculateParameter.getParameterName(),Double.parseDouble(calculateParameter.getParameterValue()));
-			}
-		}else {
-			System.out.print("quotaItemId："+quotaItem.getId()+" 无参数参与计算 "+'\n');
-		}
-		
+
 		Session session=this.getSessionFactory().openSession();
 		try {
 			if (quotaFormulas.size()>0) {
 				if (calculateParameters.size()>0) {
+					//构建计算器
+					JEP jep=new JEP();
+					for (CalculateParameter calculateParameter : calculateParameters) {
+						jep.addVariable(calculateParameter.getParameterName(),Double.parseDouble(calculateParameter.getParameterValue()));
+					}
 					for (QuotaFormula quotaFormula : quotaFormulas) {
 						boolean isCalculateWrong=false;
-						jep.parseExpression(quotaFormula.getFormula());
+						String formulaString=quotaFormula.getFormula();
+						jep.parseExpression(formulaString);
 						QuotaFormulaResultValue quotaFormulaResultValue=new QuotaFormulaResultValue();
-						quotaFormulaResultValue.setQuotaFormulaResult(quotaFormula.getQuotaFormulaResult());
-						quotaFormulaResultValue.setQuotaItem(quotaItem);
 						try {
-							quotaFormulaResultValue.setValue(new BigDecimal(jep.getValue()).setScale(digit, BigDecimal.ROUND_HALF_UP).doubleValue()+"");
+							double value=jep.getValue();
+							quotaFormulaResultValue.setQuotaFormulaResult(quotaFormula.getQuotaFormulaResult());
+							quotaFormulaResultValue.setQuotaItem(quotaItem);
+							quotaFormulaResultValue.setValue(new BigDecimal(value).setScale(digit, BigDecimal.ROUND_HALF_UP).doubleValue()+"");
 						} catch (Exception e) {
-							System.out.print("quotaItemId："+quotaItem.getId()+" 计算有误 "+'\n');
 							isCalculateWrong=true;
 						}
 						
 						if (isCalculateWrong!=true) {
 							session.save(quotaFormulaResultValue);
+							session.flush();
+							session.clear();
 						}else{
-							continue;
+							System.out.print("quotaItemId："+quotaItem.getId()+" 计算有误 "+'\n');
+							quotaFormulaResultValue.setValue("~");
+							session.save(quotaFormulaResultValue);
+							session.flush();
+							session.clear();
 						}
 					}
 				}else {

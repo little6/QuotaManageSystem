@@ -115,6 +115,8 @@ public class QuotaFormulaResultValueDao extends HibernateDao {
 				quotaFormulaResultValue.setQuotaFormulaResult(null);
 				quotaFormulaResultValue.setQuotaItem(null);
 				session.delete(quotaFormulaResultValue);
+				session.flush();
+				session.clear();
 			}
 		} catch (Exception e) {
 			System.out.print(e.toString());

@@ -1,5 +1,6 @@
 package com.quotamanagesys.dao;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -474,10 +475,31 @@ public class QuotaItemDao extends HibernateDao {
 		
 		try {
 			for (QuotaItem quotaItem : quotaItems) {
+				int digit=quotaItem.getQuotaItemCreator().getQuotaType().getDigit();
 				EntityState state = EntityUtils.getState(quotaItem);
 				if (state.equals(EntityState.NEW)) {
+					String finishValue=new BigDecimal(Double.parseDouble(quotaItem.getFinishValue())).setScale(digit, BigDecimal.ROUND_HALF_UP).doubleValue()+"";
+					String sameTermValue=new BigDecimal(Double.parseDouble(quotaItem.getSameTermValue())).setScale(digit, BigDecimal.ROUND_HALF_UP).doubleValue()+"";
+					String accumulateValue=new BigDecimal(Double.parseDouble(quotaItem.getAccumulateValue())).setScale(digit, BigDecimal.ROUND_HALF_UP).doubleValue()+"";
+					String sameTermAccumulateValue=new BigDecimal(Double.parseDouble(quotaItem.getSameTermAccumulateValue())).setScale(digit, BigDecimal.ROUND_HALF_UP).doubleValue()+"";
+					
+					quotaItem.setFinishValue(finishValue);
+					quotaItem.setSameTermValue(sameTermValue);
+					quotaItem.setAccumulateValue(accumulateValue);
+					quotaItem.setSameTermAccumulateValue(sameTermAccumulateValue);
+					
 					session.save(quotaItem);
 				} else if (state.equals(EntityState.MODIFIED)) {
+					String finishValue=new BigDecimal(Double.parseDouble(quotaItem.getFinishValue())).setScale(digit, BigDecimal.ROUND_HALF_UP).doubleValue()+"";
+					String sameTermValue=new BigDecimal(Double.parseDouble(quotaItem.getSameTermValue())).setScale(digit, BigDecimal.ROUND_HALF_UP).doubleValue()+"";
+					String accumulateValue=new BigDecimal(Double.parseDouble(quotaItem.getAccumulateValue())).setScale(digit, BigDecimal.ROUND_HALF_UP).doubleValue()+"";
+					String sameTermAccumulateValue=new BigDecimal(Double.parseDouble(quotaItem.getSameTermAccumulateValue())).setScale(digit, BigDecimal.ROUND_HALF_UP).doubleValue()+"";
+					
+					quotaItem.setFinishValue(finishValue);
+					quotaItem.setSameTermValue(sameTermValue);
+					quotaItem.setAccumulateValue(accumulateValue);
+					quotaItem.setSameTermAccumulateValue(sameTermAccumulateValue);
+					
 					boolean isWantToBeCalculated=false;
 					QuotaItem thisQuotaItem = getQuotaItem(quotaItem.getId());
 					if (quotaItem.getFinishValue() != null) {
@@ -569,15 +591,15 @@ public class QuotaItemDao extends HibernateDao {
 					}
 					updateQuotaItems.add(thisQuotaItem);
 				} else if (state.equals(EntityState.DELETED)) {					
-					//级联删除QuotaFormulaResultValue
-					Collection<QuotaFormulaResultValue> quotaFormulaResultValues = quotaFormulaResultValueDao
-							.getQuotaFormulaResultValuesByQuotaItem(quotaItem.getId());
-					quotaFormulaResultValueDao.deleteQuotaFormulaResultValues(quotaFormulaResultValues);
-					
 					//级联删除QuotaTargetValue
 					Collection<QuotaTargetValue> quotaTargetValues=quotaTargetValueDao
 							.getQuotaTargetValuesByQuotaItem(quotaItem.getId());
 					quotaTargetValueDao.deleteQuotaTargetValues(quotaTargetValues);
+					
+					//级联删除QuotaFormulaResultValue
+					Collection<QuotaFormulaResultValue> quotaFormulaResultValues = quotaFormulaResultValueDao
+							.getQuotaFormulaResultValuesByQuotaItem(quotaItem.getId());
+					quotaFormulaResultValueDao.deleteQuotaFormulaResultValues(quotaFormulaResultValues);
 
 					quotaItem.setQuotaItemCreator(null);
 					session.delete(quotaItem);
@@ -682,20 +704,19 @@ public class QuotaItemDao extends HibernateDao {
 			//删除quotaItem时，首先会在quota_item_view_xxxx中删除对应的记录
 			resultTableCreator.deleteItemsFromResultTable(quotaItems);
 			for (QuotaItem quotaItem : quotaItems) {
+				//级联删除QuotaTargetValue
+				Collection<QuotaTargetValue> quotaTargetValues=quotaTargetValueDao
+						.getQuotaTargetValuesByQuotaItem(quotaItem.getId());
+				quotaTargetValueDao.deleteQuotaTargetValues(quotaTargetValues);
+				
 				//级联删除QuotaFormulaResultValue
 				Collection<QuotaFormulaResultValue> quotaFormulaResultValues = quotaFormulaResultValueDao
 						.getQuotaFormulaResultValuesByQuotaItem(quotaItem.getId());
 				quotaFormulaResultValueDao.deleteQuotaFormulaResultValues(quotaFormulaResultValues);
 				
-				//级联删除QuotaTargetValue
-				Collection<QuotaTargetValue> quotaTargetValues=quotaTargetValueDao
-						.getQuotaTargetValuesByQuotaItem(quotaItem.getId());
-				quotaTargetValueDao.deleteQuotaTargetValues(quotaTargetValues);
-
 				quotaItem.setQuotaItemCreator(null);
 				session.delete(quotaItem);
 				session.flush();
-				session.clear();
 			}
 		} catch (Exception e) {
 			System.out.print(e.toString());

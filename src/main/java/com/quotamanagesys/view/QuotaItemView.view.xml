@@ -320,11 +320,11 @@ aaCreateOrUpdateAll.execute({&#xD;
         <Collection>
           <Entity>
             <Property name="label">超时</Property>
-            <Property name="key">true</Property>
+            <Property name="key">TRUE</Property>
           </Entity>
           <Entity>
             <Property name="label">未超时</Property>
-            <Property name="key">false</Property>
+            <Property name="key">FALSE</Property>
           </Entity>
         </Collection>
       </Property>
@@ -428,16 +428,25 @@ aaCreateOrUpdateAll.execute({&#xD;
         <Collection>
           <Entity>
             <Property name="label">已提交</Property>
-            <Property name="key">true</Property>
+            <Property name="key">TRUE</Property>
           </Entity>
           <Entity>
             <Property name="label">未提交</Property>
-            <Property name="key">false</Property>
+            <Property name="key">FALSE</Property>
           </Entity>
         </Collection>
       </Property>
       <Property name="displayProperty">label</Property>
       <Property name="property">key</Property>
+      <Property name="ignored">false</Property>
+      <Property name="filterOnOpen">false</Property>
+      <Property name="editable">true</Property>
+      <Property name="dynaFilter">false</Property>
+      <Property name="useEmptyItem">false</Property>
+      <Property name="autoOpen">false</Property>
+      <Property name="buttonVisible">true</Property>
+      <Property name="postValueOnSelect">true</Property>
+      <Property name="filterOnTyping">true</Property>
     </ListDropDown>
   </View>
 </ViewConfig>
