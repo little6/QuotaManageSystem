@@ -41,6 +41,7 @@ import com.quotamanagesys.model.QuotaCover;
 import com.quotamanagesys.model.QuotaFormula;
 import com.quotamanagesys.model.QuotaItem;
 import com.quotamanagesys.model.QuotaItemCreator;
+import com.quotamanagesys.model.QuotaItemViewMap;
 import com.quotamanagesys.model.QuotaProperty;
 import com.quotamanagesys.model.QuotaPropertyValue;
 import com.quotamanagesys.model.QuotaTargetValue;
@@ -71,6 +72,8 @@ public class QuotaItemCreatorDao extends HibernateDao {
 	ResultTableCreator resultTableCreator;
 	@Resource
 	CriteriaConvertCore criteriaConvertCore;
+	@Resource
+	QuotaItemViewMapDao quotaItemViewMapDao;
 
 	@DataProvider
 	public Collection<QuotaItemCreator> getAll() {
@@ -151,6 +154,27 @@ public class QuotaItemCreatorDao extends HibernateDao {
 		return quotaItemCreators;
 	}
 	
+	@DataProvider
+	public Collection<QuotaItemCreator> getQuotaItemCreatorsByManageDeptOrDutyDept(String deptId){
+		String hqlString = "from " + QuotaItemCreator.class.getName()
+				+ " where quotaDutyDept.id='" + deptId + "' or quotaType.manageDept.id='"+deptId+"'"
+				+" order by quotaType.quotaLevel.level asc,quotaType.name asc,quotaCover.sort asc";
+		Collection<QuotaItemCreator> quotaItemCreators = this.query(hqlString);
+		return quotaItemCreators;
+	}
+	
+	@DataProvider
+	public QuotaItemCreator getQuotaItemCreatorByQuotaTypeAndCover(String quotaTypeId,String quotaCoverId){
+		String hqlString = "from " + QuotaItemCreator.class.getName()
+				+ " where quotaType.id='" + quotaTypeId + "' and quotaCover.id='"+quotaCoverId+"'";
+		List<QuotaItemCreator> quotaItemCreators = this.query(hqlString);
+		if (quotaItemCreators.size()>0) {
+			return quotaItemCreators.get(0);
+		} else {
+			return null;
+		}
+	}
+	
 	//分页方式查询
 	@DataProvider
 	public void getQuotaItemCreatorsByManageDeptWithPage(Page<QuotaItemCreator> page,Criteria criteria,String manageDeptId) throws Exception{
@@ -167,6 +191,21 @@ public class QuotaItemCreatorDao extends HibernateDao {
 		} else {
 			System.out.print("参数为空");
 		}
+	}
+	
+	//
+	@DataProvider
+	public Collection<QuotaItemCreator> getQuotaItemCreatorsByCriteria(Criteria criteria){
+		String filterString=criteriaConvertCore.convertToSQLString(criteria);
+		String hqlString =null;
+		if (!filterString.equals("")) {
+			filterString=" ("+filterString+")";
+			hqlString = "from " + QuotaItemCreator.class.getName()+ " where "+filterString;
+		}else {
+			hqlString = "from " + QuotaItemCreator.class.getName();
+		}
+		Collection<QuotaItemCreator> quotaItemCreators=this.query(hqlString);
+		return quotaItemCreators;
 	}
 	
 	/*
@@ -544,11 +583,26 @@ public class QuotaItemCreatorDao extends HibernateDao {
 					QuotaItemCreator thisQuotaItemCreator=getQuotaItemCreator(quotaItemCreator.getId());
 					thisQuotaItemCreator.setQuotaType(quotaType);
 					thisQuotaItemCreator.setName(quotaType.getName());
-					thisQuotaItemCreator.setQuotaCover(quotaCoverDao.getQuotaCover(quotaItemCreator.getQuotaCover().getId()));
-					thisQuotaItemCreator.setQuotaDutyDept(departmentDao.getDept(quotaItemCreator.getQuotaDutyDept().getId()));
+					
+					boolean isDutyDeptChanged=false;
+					if (!thisQuotaItemCreator.getQuotaDutyDept().getId().equals(quotaItemCreator.getQuotaDutyDept().getId())) {
+						thisQuotaItemCreator.setQuotaDutyDept(departmentDao.getDept(quotaItemCreator.getQuotaDutyDept().getId()));
+						isDutyDeptChanged=true;
+					}
+					
+					boolean isCoverChanged=false;
+					if (thisQuotaItemCreator.getQuotaCover().getId().equals(quotaItemCreator.getQuotaCover().getId())) {
+						thisQuotaItemCreator.setQuotaCover(quotaCoverDao.getQuotaCover(quotaItemCreator.getQuotaCover().getId()));
+						isCoverChanged=true;
+					}
+					
 					thisQuotaItemCreator.setYear(quotaItemCreator.getYear());
 					session.merge(thisQuotaItemCreator);
 					session.flush();
+					
+					if (isDutyDeptChanged==true||isCoverChanged==true) {
+						quotaItemViewMapDao.initQuotaItemViewMapsByQuotaItemCreator(quotaItemCreator.getId(),isDutyDeptChanged,isCoverChanged);
+					}
 					
 					Collection<QuotaItem> quotaItems=quotaItemDao.getQuotaItemsByQuotaItemCreator(quotaItemCreator.getId());
 					resultTableCreator.createOrUpdateResultTable(quotaItems);
@@ -655,6 +709,12 @@ public class QuotaItemCreatorDao extends HibernateDao {
 		//级联删除QuotaItem
 		Collection<QuotaItem> quotaItems=quotaItemDao.getQuotaItemsByQuotaItemCreator(quotaItemCreator.getId());
 		quotaItemDao.deleteQuotaItems(quotaItems);
+		
+		//级联删除QuotaItemViewMap
+		String quotaTypeId=quotaItemCreator.getQuotaType().getId();
+		String quotaCoverId=quotaItemCreator.getQuotaCover().getId();
+		Collection<QuotaItemViewMap> quotaItemViewMaps=quotaItemViewMapDao.getQuotaItemViewMapsByQuotaTypeAndCover(quotaTypeId, quotaCoverId);
+		quotaItemViewMapDao.delete(quotaItemViewMaps);
 		
 		quotaItemCreator.setQuotaCover(null);
 		quotaItemCreator.setQuotaDutyDept(null);

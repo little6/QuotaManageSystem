@@ -21,7 +21,7 @@ public class UserDeptDao extends HibernateDao {
 	@Resource
 	UserPositionDao userPositionDao;
 	@Resource
-	QuotaTypeViewMapDao quotaTypeViewMapDao;
+	QuotaItemViewMapDao quotaItemViewMapDao;
 	
 	@DataProvider
 	public Collection<UserDept> getAll() {
@@ -76,7 +76,8 @@ public class UserDeptDao extends HibernateDao {
 			session.flush();
 			
 			//调整用户指标可视范围
-			quotaTypeViewMapDao.initQuotaTypeViewMapsByUser(username);
+			quotaItemViewMapDao.initQuotaItemViewMapsByUser(username);
+			
 		} catch (Exception e) {
 			System.out.print(e.toString());
 		}finally{

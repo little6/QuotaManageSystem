@@ -32,10 +32,10 @@ import com.quotamanagesys.interceptor.ResultTableCreator;
 import com.quotamanagesys.model.QuotaCover;
 import com.quotamanagesys.model.QuotaItem;
 import com.quotamanagesys.model.QuotaItemCreator;
+import com.quotamanagesys.model.QuotaItemViewMap;
 import com.quotamanagesys.model.QuotaLevel;
 import com.quotamanagesys.model.QuotaPropertyValue;
 import com.quotamanagesys.model.QuotaType;
-import com.quotamanagesys.model.QuotaTypeViewMap;
 import com.quotamanagesys.tools.CriteriaConvertCore;
 
 @Component
@@ -56,7 +56,7 @@ public class QuotaTypeDao extends HibernateDao {
 	@Resource
 	DepartmentDao departmentDao;
 	@Resource
-	QuotaTypeViewMapDao quotaTypeViewMapDao;
+	QuotaItemViewMapDao quotaItemViewMapDao;
 	@Resource
 	UserDao userDao;
 	@Resource
@@ -286,55 +286,20 @@ public class QuotaTypeDao extends HibernateDao {
 							//更新原管理部门中用户的指标显示关联
 							Collection<DefaultUser> oldUsers=userDao.getUsersByDept(oldQuotaType.getManageDept().getId());
 							for (DefaultUser oldUser : oldUsers) {
-								QuotaTypeViewMap quotaTypeViewMap=quotaTypeViewMapDao.getQuotaTypeViewMapByUser(oldUser.getUsername());
-								//为提高性能，涉及大量处理时直接采用jdbc，hibernate效率太低
-								String sqlString1="delete from can_view_quota_type where QUOTA_TYPE_ID='"+quotaType.getId()
-										+"' and QUOTA_TYPE_VIEW_MAP_ID='"+quotaTypeViewMap.getId()+"'";
-								String sqlString2="delete from default_view_quota_type where QUOTA_TYPE_ID='"+quotaType.getId()
-										+"' and QUOTA_TYPE_VIEW_MAP_ID='"+quotaTypeViewMap.getId()+"'";
-								excuteSQL(sqlString1);
-								excuteSQL(sqlString2);	
+								Collection<QuotaItemViewMap> quotaItemViewMaps=quotaItemViewMapDao.getQuotaItemViewMapsByUser(oldUser.getUsername());
+								quotaItemViewMapDao.delete(quotaItemViewMaps);
 							}
 							//更新现管理部门中用户的指标显示关联
 							Collection<DefaultUser> newUsers=userDao.getUsersByDept(quotaType.getManageDept().getId());
 							for (DefaultUser newUser : newUsers) {
-								QuotaTypeViewMap quotaTypeViewMap=quotaTypeViewMapDao.getQuotaTypeViewMapByUser(newUser.getUsername());
-								Set<QuotaType> canViewQuotaTypes=quotaTypeViewMap.getCanViewQuotaTypes();
-								Set<QuotaType> defaultViewQuotaTypes=quotaTypeViewMap.getDefaultViewQuotaTypes();
-								canViewQuotaTypes.add(getQuotaType(quotaType.getId()));
-								defaultViewQuotaTypes.add(getQuotaType(quotaType.getId()));
-								quotaTypeViewMap.setCanViewQuotaTypes(canViewQuotaTypes);
-								quotaTypeViewMap.setDefaultViewQuotaTypes(defaultViewQuotaTypes);
-								session.merge(quotaTypeViewMap);
-								session.flush();
-								session.clear();
+								quotaItemViewMapDao.initQuotaItemViewMapsByUser(newUser.getUsername());
 							}
 						}
 					}
 					
 					//在用状态变更
 					if (quotaType.isInUsed()!=oldQuotaType.isInUsed()) {
-						if (quotaType.isInUsed()==true) {
-							Collection<DefaultUser> users=userDao.getUsersByDept(quotaType.getManageDept().getId());
-							for (DefaultUser user : users) {
-								QuotaTypeViewMap quotaTypeViewMap=quotaTypeViewMapDao.getQuotaTypeViewMapByUser(user.getUsername());
-								Set<QuotaType> canViewQuotaTypes=quotaTypeViewMap.getCanViewQuotaTypes();
-								Set<QuotaType> defaultViewQuotaTypes=quotaTypeViewMap.getDefaultViewQuotaTypes();
-								canViewQuotaTypes.add(getQuotaType(quotaType.getId()));
-								defaultViewQuotaTypes.add(getQuotaType(quotaType.getId()));
-								quotaTypeViewMap.setCanViewQuotaTypes(canViewQuotaTypes);
-								quotaTypeViewMap.setDefaultViewQuotaTypes(defaultViewQuotaTypes);
-								session.merge(quotaTypeViewMap);
-								session.flush();
-								session.clear();
-							}
-						} else {
-							//为提高性能，涉及大量处理时直接采用jdbc，hibernate效率太低
-							String sqlString1="delete from can_view_quota_type where QUOTA_TYPE_ID='"+quotaType.getId()+"'";
-							String sqlString2="delete from default_view_quota_type where QUOTA_TYPE_ID='"+quotaType.getId()+"'";
-							excuteSQL(sqlString1);
-							excuteSQL(sqlString2);
-							
+						if (quotaType.isInUsed()==false) {
 							Collection<QuotaItemCreator> quotaItemCreators=quotaItemCreatorDao.getQuotaItemCreatorsByQuotaType(oldQuotaType.getId());
 							if (quotaItemCreators.size()>0) {
 								quotaItemCreatorDao.deleteQuotaItemCreators(quotaItemCreators);

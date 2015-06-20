@@ -42,13 +42,13 @@ import com.bstek.dorado.view.widget.grid.StretchColumnsMode;
 import com.bstek.dorado.view.widget.treegrid.TreeGrid;
 import com.bstek.dorado.web.DoradoContext;
 import com.quotamanagesys.dao.DepartmentDao;
+import com.quotamanagesys.dao.QuotaItemViewMapDao;
 import com.quotamanagesys.dao.QuotaItemViewTableManageDao;
-import com.quotamanagesys.dao.QuotaTypeViewMapDao;
 import com.quotamanagesys.dao.ShowColumnDao;
 import com.quotamanagesys.dao.ShowColumnGroupDao;
 import com.quotamanagesys.model.QuotaItem;
+import com.quotamanagesys.model.QuotaItemViewMap;
 import com.quotamanagesys.model.QuotaItemViewTableManage;
-import com.quotamanagesys.model.QuotaTypeViewMap;
 import com.quotamanagesys.model.ShowColumn;
 import com.quotamanagesys.model.ShowColumnGroup;
 import com.quotamanagesys.model.ShowColumnTrigger;
@@ -63,7 +63,7 @@ public class ResultGridCreator extends HibernateDao{
 	@Resource
 	ShowColumnGroupDao showColumnGroupDao;
 	@Resource
-	QuotaTypeViewMapDao quotaTypeViewMapDao;
+	QuotaItemViewMapDao quotaItemViewMapDao;
 	@Resource
 	QuotaItemViewTableManageDao quotaItemViewTableManageDao;
 	@Resource
@@ -108,7 +108,7 @@ public class ResultGridCreator extends HibernateDao{
 		try {
 			QuotaItemViewTableManage quotaItemViewTableManage=quotaItemViewTableManageDao.getItemViewTableManageByYear(year);
 			if (quotaItemViewTableManage!=null) {
-				rs=getResultSet(conn,"select * from "+quotaItemViewTableManage.getTableName());
+				rs=getResultSet(conn,"select * from "+quotaItemViewTableManage.getTableName()+" limit 0,1");
 				rsm=rs.getMetaData();
 			}else {
 				isSuccess=false;
@@ -328,11 +328,13 @@ public class ResultGridCreator extends HibernateDao{
 				QuotaItemViewTableManage quotaItemViewTableManage=quotaItemViewTableManageDao.getItemViewTableManageByYear(year);
 				if (quotaItemViewTableManage!=null) {
 					String tableName=quotaItemViewTableManage.getTableName();
-					ResultSet rs=getResultSet(conn,"select * from "+tableName);
+					ResultSet rs=getResultSet(conn,"select * from "+tableName+" limit 0,1");
 					ResultSetMetaData rsm=rs.getMetaData();
 					
 					IUser loginuser = ContextHolder.getLoginUser();
 					String queryString = null;
+					List resultList=new ArrayList<>();
+					
 					if (loginuser.isAdministrator()) {
 						switch (month) {
 						case 13:
@@ -352,47 +354,69 @@ public class ResultGridCreator extends HibernateDao{
 							queryString="select * from "+tableName+" where 月度="+month+filterString;
 							break;
 						}
+						resultList=getQueryResults(queryString);
+						queryString=null;
 					}else {
-						List<IDept> idepts=loginuser.getDepts();
 						String userId=loginuser.getUsername();
-						QuotaTypeViewMap quotaTypeViewMap=quotaTypeViewMapDao.getQuotaTypeViewMapByUser(userId);
-						if (quotaTypeViewMap!=null) {
-							String quotaTypeViewMapId=quotaTypeViewMap.getId();
+						Collection<QuotaItemViewMap> quotaItemViewMaps=quotaItemViewMapDao.getQuotaItemViewMapsByUser(userId);
+						
+						if (quotaItemViewMaps.size()>0) {
 							if (viewscope.equals("default")) {
-								switch (month) {
-								case 13:
-									queryString="select * from "+tableName+" where 考核频率='月' and 指标种类id in (select QUOTA_TYPE_ID from default_view_quota_type where QUOTA_TYPE_VIEW_MAP_ID='"+quotaTypeViewMapId+"')"+filterString;
-									break;
-								case 14:
-									queryString="select * from "+tableName+" where 考核频率='年' and 指标种类id in (select QUOTA_TYPE_ID from default_view_quota_type where QUOTA_TYPE_VIEW_MAP_ID='"+quotaTypeViewMapId+"')"+filterString;
-									break;
-								case 15:
-									queryString="select * from "+tableName+" where 指标种类id in (select QUOTA_TYPE_ID from default_view_quota_type where QUOTA_TYPE_VIEW_MAP_ID='"+quotaTypeViewMapId+"')"+filterString;
-									break;
-								default:
-									queryString="select * from "+tableName+" where 月度="+month+" and 指标种类id in (select QUOTA_TYPE_ID from default_view_quota_type where QUOTA_TYPE_VIEW_MAP_ID='"+quotaTypeViewMapId+"')"+filterString;
-									break;
+								for (QuotaItemViewMap quotaItemViewMap : quotaItemViewMaps) {
+									String quotaTypeId=quotaItemViewMap.getQuotaType().getId();
+									String quotaCoverId=quotaItemViewMap.getQuotaCover().getId();
+									if (quotaItemViewMap.isDefaultView()==true) {
+										switch (month) {
+										case 13:
+											queryString="select * from "+tableName+" where 考核频率='月' and 指标种类id='"+quotaTypeId+"' and 口径id='"+quotaCoverId+"'"+filterString;
+											break;
+										case 14:
+											queryString="select * from "+tableName+" where 考核频率='年' and 指标种类id='"+quotaTypeId+"' and 口径id='"+quotaCoverId+"'"+filterString;
+											break;
+										case 15:
+											queryString="select * from "+tableName+" where 指标种类id='"+quotaTypeId+"' and 口径id='"+quotaCoverId+"'"+filterString;
+											break;
+										default:
+											queryString="select * from "+tableName+" where 月度="+month+" and 指标种类id='"+quotaTypeId+"' and 口径id='"+quotaCoverId+"'"+filterString;
+											break;
+										}
+										List list=getQueryResults(queryString);
+										if (list.size()>0) {
+											resultList.addAll(list);
+										}
+										queryString=null;
+									}
 								}
 							}else if (viewscope.equals("can")) {
-								switch (month) {
-								case 13:
-									queryString="select * from "+tableName+" where 考核频率='月' and 指标种类id in (select QUOTA_TYPE_ID from can_view_quota_type where QUOTA_TYPE_VIEW_MAP_ID='"+quotaTypeViewMapId+"')"+filterString;
-									break;
-								case 14:
-									queryString="select * from "+tableName+" where 考核频率='年' and 指标种类id in (select QUOTA_TYPE_ID from can_view_quota_type where QUOTA_TYPE_VIEW_MAP_ID='"+quotaTypeViewMapId+"')"+filterString;
-									break;
-								case 15:
-									queryString="select * from "+tableName+" where 指标种类id in (select QUOTA_TYPE_ID from can_view_quota_type where QUOTA_TYPE_VIEW_MAP_ID='"+quotaTypeViewMapId+"')"+filterString;
-									break;
-								default:
-									queryString="select * from "+tableName+" where 月度="+month+" and 指标种类id in (select QUOTA_TYPE_ID from can_view_quota_type where QUOTA_TYPE_VIEW_MAP_ID='"+quotaTypeViewMapId+"')"+filterString;
-									break;
+								for (QuotaItemViewMap quotaItemViewMap : quotaItemViewMaps) {
+									String quotaTypeId=quotaItemViewMap.getQuotaType().getId();
+									String quotaCoverId=quotaItemViewMap.getQuotaCover().getId();
+									if (quotaItemViewMap.isCanView()==true) {
+										switch (month) {
+										case 13:
+											queryString="select * from "+tableName+" where 考核频率='月' and 指标种类id='"+quotaTypeId+"' and 口径id='"+quotaCoverId+"'"+filterString;
+											break;
+										case 14:
+											queryString="select * from "+tableName+" where 考核频率='年' and 指标种类id='"+quotaTypeId+"' and 口径id='"+quotaCoverId+"'"+filterString;
+											break;
+										case 15:
+											queryString="select * from "+tableName+" where 指标种类id='"+quotaTypeId+"' and 口径id='"+quotaCoverId+"'"+filterString;
+											break;
+										default:
+											queryString="select * from "+tableName+" where 月度="+month+" and 指标种类id='"+quotaTypeId+"' and 口径id='"+quotaCoverId+"'"+filterString;
+											break;
+										}
+										List list=getQueryResults(queryString);
+										if (list.size()>0) {
+											resultList.addAll(list);
+										}
+										queryString=null;
+									}		
 								}
-							}
+							}						
 						}
 					}
-
-					List resultList=getQueryResults(queryString);
+					
 					int i=0;
 					int j=0;
 					for (Object result : resultList) {

@@ -14,6 +14,7 @@ import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.bstek.bdf2.core.CoreHibernateDao;
+import com.bstek.bdf2.core.business.IDept;
 import com.bstek.bdf2.core.business.IUser;
 import com.bstek.bdf2.core.context.ContextHolder;
 import com.bstek.bdf2.core.exception.NoneLoginException;
@@ -33,7 +34,7 @@ import com.bstek.dorado.data.entity.EntityState;
 import com.bstek.dorado.data.entity.EntityUtils;
 import com.bstek.dorado.data.provider.Criteria;
 import com.bstek.dorado.data.provider.Page;
-import com.quotamanagesys.model.QuotaTypeViewMap;
+import com.quotamanagesys.model.QuotaItemViewMap;
 
 @Component
 public class UserDao extends CoreHibernateDao {
@@ -41,7 +42,7 @@ public class UserDao extends CoreHibernateDao {
 	@Resource
 	UserDeptDao userDeptDao;
 	@Resource
-	QuotaTypeViewMapDao quotaTypeViewMapDao;
+	QuotaItemViewMapDao quotaItemViewMapDao;
 	
 	private IRoleService roleService;
 	private IGroupService groupService;
@@ -108,6 +109,16 @@ public class UserDao extends CoreHibernateDao {
 		}
 		return user;
 	}
+	
+	@DataProvider
+	public Collection<DefaultUser> getLoginUsers(){
+		IUser loginuser = ContextHolder.getLoginUser();
+		String hqlString = "from " + DefaultUser.class.getName()
+				+ " where username='" + loginuser.getUsername() + "'";
+		List<DefaultUser> defaultUsers = this.query(hqlString);
+		
+		return defaultUsers;
+	}
 
 	@DataResolver
 	public void saveUsers(Collection<DefaultUser> users,String deptId) throws Exception{
@@ -150,10 +161,8 @@ public class UserDao extends CoreHibernateDao {
 						userDeptDao.deleteUserDeptByUser(user.getUsername());
 					}
 					
-					QuotaTypeViewMap quotaTypeViewMap=quotaTypeViewMapDao.getQuotaTypeViewMapByUser(user.getUsername());
-					Collection<QuotaTypeViewMap> quotaTypeViewMaps=new ArrayList<QuotaTypeViewMap>();
-					quotaTypeViewMaps.add(quotaTypeViewMap);
-					quotaTypeViewMapDao.delete(quotaTypeViewMaps);
+					Collection<QuotaItemViewMap> quotaItemViewMaps=quotaItemViewMapDao.getQuotaItemViewMapsByUser(user.getUsername());
+					quotaItemViewMapDao.delete(quotaItemViewMaps);
 					
 					session.delete(user);
 				}

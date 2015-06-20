@@ -2,6 +2,7 @@ package com.quotamanagesys.interceptor;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -18,10 +19,10 @@ import com.bstek.bdf2.core.orm.hibernate.HibernateDao;
 import com.bstek.dorado.annotation.DataProvider;
 import com.bstek.dorado.data.variant.Record;
 import com.bstek.dorado.web.DoradoContext;
+import com.quotamanagesys.dao.QuotaItemViewMapDao;
 import com.quotamanagesys.dao.QuotaItemViewTableManageDao;
-import com.quotamanagesys.dao.QuotaTypeViewMapDao;
+import com.quotamanagesys.model.QuotaItemViewMap;
 import com.quotamanagesys.model.QuotaItemViewTableManage;
-import com.quotamanagesys.model.QuotaTypeViewMap;
 
 @Component
 public class DropDownDataCreator extends HibernateDao {
@@ -29,7 +30,7 @@ public class DropDownDataCreator extends HibernateDao {
 	@Resource
 	QuotaItemViewTableManageDao quotaItemViewTableManageDao;
 	@Resource
-	QuotaTypeViewMapDao quotaTypeViewMapDao;
+	QuotaItemViewMapDao quotaItemViewMapDao;
 	
 	@DataProvider
 	public ArrayList<Record> getDropDownData(String columnName) {
@@ -89,37 +90,36 @@ public class DropDownDataCreator extends HibernateDao {
 				} else {
 					List<IDept> idepts = loginuser.getDepts();
 					String userId = loginuser.getUsername();
-					QuotaTypeViewMap quotaTypeViewMap = quotaTypeViewMapDao
-							.getQuotaTypeViewMapByUser(userId);
-					if (quotaTypeViewMap != null) {
-						String quotaTypeViewMapId = quotaTypeViewMap.getId();
+					Collection<QuotaItemViewMap> quotaItemViewMaps=quotaItemViewMapDao.getQuotaItemViewMapsByUser(userId);
+					
+					if (quotaItemViewMaps.size()>0) {
 						if (viewscope.equals("default")) {
 							switch (month) {
 							case 13:
 								queryString = "select "+columnName+" from "
 										+ tableName
-										+ " where 考核频率='月' and 指标种类id in (select QUOTA_TYPE_ID from default_view_quota_type where QUOTA_TYPE_VIEW_MAP_ID='"
-										+ quotaTypeViewMapId + "')"+" GROUP BY "+columnName;
+										+ " where 考核频率='月' and 指标种类id in (select QUOTA_TYPE_ID from QUOTA_ITEM_VIEW_MAP where USER_ID='"
+										+ userId + "' and DEFAULT_VIEW=true)"+" GROUP BY "+columnName;
 								break;
 							case 14:
 								queryString = "select "+columnName+" from "
 										+ tableName
-										+ " where 考核频率='年' and 指标种类id in (select QUOTA_TYPE_ID from default_view_quota_type where QUOTA_TYPE_VIEW_MAP_ID='"
-										+ quotaTypeViewMapId + "')"+" GROUP BY "+columnName;
+										+ " where 考核频率='年' and 指标种类id in (select QUOTA_TYPE_ID from QUOTA_ITEM_VIEW_MAP where USER_ID='"
+										+ userId + "' and DEFAULT_VIEW=true)"+" GROUP BY "+columnName;
 								break;
 							case 15:
 								queryString = "select "+columnName+" from "
 										+ tableName
-										+ " where 指标种类id in (select QUOTA_TYPE_ID from default_view_quota_type where QUOTA_TYPE_VIEW_MAP_ID='"
-										+ quotaTypeViewMapId + "')"+" GROUP BY "+columnName;
+										+ " where 指标种类id in (select QUOTA_TYPE_ID from QUOTA_ITEM_VIEW_MAP where USER_ID='"
+										+ userId + "' and DEFAULT_VIEW=true)"+" GROUP BY "+columnName;
 								break;
 							default:
 								queryString = "select "+columnName+" from "
 										+ tableName
 										+ " where 月度="
 										+ month
-										+ " and 指标种类id in (select QUOTA_TYPE_ID from default_view_quota_type where QUOTA_TYPE_VIEW_MAP_ID='"
-										+ quotaTypeViewMapId + "')"+" GROUP BY "+columnName;
+										+ " and 指标种类id in (select QUOTA_TYPE_ID from QUOTA_ITEM_VIEW_MAP where USER_ID='"
+										+ userId + "' and DEFAULT_VIEW=true)"+" GROUP BY "+columnName;
 								break;
 							}
 						} else if (viewscope.equals("can")) {
@@ -127,28 +127,28 @@ public class DropDownDataCreator extends HibernateDao {
 							case 13:
 								queryString = "select "+columnName+" from "
 										+ tableName
-										+ " where 考核频率='月' and 指标种类id in (select QUOTA_TYPE_ID from can_view_quota_type where QUOTA_TYPE_VIEW_MAP_ID='"
-										+ quotaTypeViewMapId + "')"+" GROUP BY "+columnName;
+										+ " where 考核频率='月' and 指标种类id in (select QUOTA_TYPE_ID from QUOTA_ITEM_VIEW_MAP where USER_ID='"
+										+ userId + "' and CAN_VIEW=true)"+" GROUP BY "+columnName;
 								break;
 							case 14:
 								queryString = "select "+columnName+" from "
 										+ tableName
-										+ " where 考核频率='年' and 指标种类id in (select QUOTA_TYPE_ID from can_view_quota_type where QUOTA_TYPE_VIEW_MAP_ID='"
-										+ quotaTypeViewMapId + "')"+" GROUP BY "+columnName;
+										+ " where 考核频率='年' and 指标种类id in (select QUOTA_TYPE_ID from QUOTA_ITEM_VIEW_MAP where USER_ID='"
+										+ userId + "' and CAN_VIEW=true)"+" GROUP BY "+columnName;
 								break;
 							case 15:
 								queryString = "select "+columnName+" from "
 										+ tableName
-										+ " where 指标种类id in (select QUOTA_TYPE_ID from can_view_quota_type where QUOTA_TYPE_VIEW_MAP_ID='"
-										+ quotaTypeViewMapId + "')"+" GROUP BY "+columnName;
+										+ " where 指标种类id in (select QUOTA_TYPE_ID from QUOTA_ITEM_VIEW_MAP where USER_ID='"
+										+ userId + "' and CAN_VIEW=true)"+" GROUP BY "+columnName;
 								break;
 							default:
 								queryString = "select "+columnName+" from "
 										+ tableName
 										+ " where 月度="
 										+ month
-										+ " and 指标种类id in (select QUOTA_TYPE_ID from can_view_quota_type where QUOTA_TYPE_VIEW_MAP_ID='"
-										+ quotaTypeViewMapId + "')"+" GROUP BY "+columnName;
+										+ " and 指标种类id in (select QUOTA_TYPE_ID from QUOTA_ITEM_VIEW_MAP where USER_ID='"
+										+ userId + "' and CAN_VIEW=true)"+" GROUP BY "+columnName;
 								break;
 							}
 						}
