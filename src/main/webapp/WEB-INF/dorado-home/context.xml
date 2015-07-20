@@ -10,6 +10,15 @@ http://www.bstek.com/dorado/schema http://www.bstek.com/dorado/schema/spring-dor
 		</property>
 	</bean>
 	
+	<bean parent="dorado.viewConfigFactoryRegister">
+        <property name="viewNamePattern" value="**" />
+        <property name="viewConfigFactory">
+            <bean parent="dorado.xmlViewConfigDefinitionFactory">
+                <property name="pathPrefix" value="${view.root}" />
+            </bean>
+        </property>
+    </bean>
+	
 	<bean parent="dorado.dataConfigLoader">
 		<property name="configLocation" value="${model.root}/*.model.xml" />
 	</bean>

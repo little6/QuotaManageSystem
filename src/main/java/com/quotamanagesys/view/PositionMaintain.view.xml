@@ -106,7 +106,7 @@ uaPosition.execute({&#xD;
 			dgPosition.refresh();&#xD;
         }&#xD;
 		else{&#xD;
-			alert(&quot;执行失败！发生异常：&quot; + obj);&#xD;
+			
 		}&#xD;
 	}&#xD;
 });</ClientEvent>

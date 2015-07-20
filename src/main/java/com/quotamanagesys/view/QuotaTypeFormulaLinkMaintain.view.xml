@@ -36,6 +36,12 @@
       <PropertyDef name="inUsed">
         <Property name="dataType">boolean</Property>
       </PropertyDef>
+      <PropertyDef name="calculationFormulaInfo">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="quotaDefinitionInfo">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
     </DataType>
     <DataType name="QuotaProfession">
       <Property name="creationType">com.quotamanagesys.model.QuotaProfession</Property>
@@ -218,7 +224,7 @@ if (selection &amp;&amp; selection.length){&#xD;
 		if (success) {&#xD;
 			&#xD;
         }&#xD;
-		else{alert(&quot;执行失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 	});&#xD;
 }&#xD;
 else {&#xD;
@@ -253,6 +259,15 @@ ipQuotaTypeFormula.execute(&#xD;
               <Property name="caption">导入计算公式</Property>
               <Property name="icon">url(>skin>common/icons.gif) -120px -240px</Property>
             </ToolBarButton>
+            <Fill/>
+            <ToolBarButton>
+              <ClientEvent name="onClick">var aaDownloadHelpFile=view.get(&quot;#aaDownloadHelpFile&quot;);&#xD;
+aaDownloadHelpFile.set(&quot;parameter&quot;,{helpname:&quot;QuotaTypeFormulaLinkMaintain&quot;});&#xD;
+aaDownloadHelpFile.execute();</ClientEvent>
+              <Property name="caption">帮助</Property>
+              <Property name="icon">url(>skin>common/icons.gif) -180px -0px</Property>
+            </ToolBarButton>
+            <Separator/>
           </ToolBar>
           <DataGrid id="dgQuotaType">
             <ClientEvent name="onClick">var dsQuotaFormulaLinked=view.get(&quot;#dsQuotaFormulaLinked&quot;);&#xD;
@@ -286,7 +301,7 @@ dgFormulaParameterLinked.refresh();&#xD;
             <DataColumn name="quotaTypeName">
               <Property name="property">name</Property>
               <Property name="caption">指标种类名称</Property>
-              <Property name="width">300</Property>
+              <Property name="width">180</Property>
               <Property name="wrappable">true</Property>
             </DataColumn>
             <DataColumn name="quotaProfession">
@@ -380,6 +395,22 @@ dgFormulaParameterLinked.refresh();&#xD;
               <Property name="align">center</Property>
               <Editor/>
             </DataColumn>
+            <DataColumn name="calculationFormulaInfo">
+              <Property name="property">calculationFormulaInfo</Property>
+              <Property name="wrappable">true</Property>
+              <Property name="align">left</Property>
+              <Property name="caption">统计公式</Property>
+              <Property name="width">180</Property>
+              <Property name="readOnly">true</Property>
+            </DataColumn>
+            <DataColumn name="quotaDefinitionInfo">
+              <Property name="property">quotaDefinitionInfo</Property>
+              <Property name="wrappable">true</Property>
+              <Property name="align">left</Property>
+              <Property name="caption">指标定义</Property>
+              <Property name="width">180</Property>
+              <Property name="readOnly">true</Property>
+            </DataColumn>
             <DataColumn name="inUsed">
               <Property name="property">inUsed</Property>
               <Property name="caption">是否在用</Property>
@@ -388,7 +419,7 @@ dgFormulaParameterLinked.refresh();&#xD;
             </DataColumn>
           </DataGrid>
           <AjaxAction id="aaClearQuotaTypeFormulaLink">
-            <Property name="service">quotaTypeFormulaLinkDao#clearQuotaTypeFormulaLink</Property>
+            <Property name="service">quotaTypeFormulaLinkDao#clearQuotaTypesFormulaLink</Property>
             <Property name="executingMessage">正在清除该指标种类关联的计算公式..</Property>
             <Property name="successMessage">清除完成！</Property>
           </AjaxAction>
@@ -401,6 +432,11 @@ dgFormulaParameterLinked.refresh();&#xD;
             <Property name="executingMessage">正在导入计算公式...</Property>
             <Property name="successMessage">导入完成！</Property>
           </AjaxAction>
+          <DownloadAction id="aaDownloadHelpFile">
+            <Property name="fileProvider">userHelpCenter#getHelpBook</Property>
+            <Property name="inlineMode">browser</Property>
+            <Property name="caption">下载该模块说明书</Property>
+          </DownloadAction>
         </Container>
       </MainControl>
       <SideControl>
@@ -463,7 +499,7 @@ uaFormulaParameterLinked.execute({&#xD;
 			//dsFormulaParameterLinked.flushAsync();&#xD;
 			//dgFormulaParameterLinked.refresh();&#xD;
 		}else{&#xD;
-			alert(&quot;执行失败！发生异常：&quot; + obj)&#xD;
+			
 		}&#xD;
 	}&#xD;
 })&#xD;
@@ -653,7 +689,7 @@ uaQuotaFormulaLink.execute({&#xD;
 			dsQuotaFormulaLinked.set(&quot;parameter&quot;,{quotaTypeId:quotaTypeId}).flushAsync();&#xD;
 			dgQuotaFormulaLinked.refresh();&#xD;
 		}else{&#xD;
-			alert(&quot;执行失败！发生异常：&quot; + obj)&#xD;
+			
 		}&#xD;
 	}&#xD;
 })&#xD;

@@ -104,6 +104,12 @@
       <PropertyDef name="inUsed">
         <Property name="dataType">boolean</Property>
       </PropertyDef>
+      <PropertyDef name="calculationFormulaInfo">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="quotaDefinitionInfo">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
     </DataType>
     <DataType name="QuotaProfession" meta="x:375;y:30">
       <Property name="creationType">com.quotamanagesys.model.QuotaProfession</Property>
@@ -253,19 +259,9 @@ switch (arg.code) {&#xD;
 		dsQuotaItemCreatorForSelect.flushAsync();&#xD;
 		arg.processDefault=false;&#xD;
 		break;&#xD;
-	}case &quot;-&quot;:{&#xD;
-		dorado.MessageBox.confirm(&quot;您真的想删除当前数据吗?&quot;,function(){	&#xD;
-			if (selection &amp;&amp; selection.length) {&#xD;
-				selection.each(function(data){&#xD;
-					datas.remove(data);&#xD;
-				});&#xD;
-			}else {message = &quot;未选中任何记录！&quot;;}&#xD;
-		});&#xD;
-		arg.processDefault=false;&#xD;
-		break;&#xD;
 	}&#xD;
 }</ClientEvent>
-                <Property name="itemCodes">+,-,pages,pageSize</Property>
+                <Property name="itemCodes">+,pages,pageSize</Property>
                 <Property name="dataSet">dsQuotaItemViewMap</Property>
               </DataPilot>
               <Separator/>
@@ -284,7 +280,7 @@ uaQuotaItemViewMap.execute({&#xD;
 			dsQuotaItemViewMap.set(&quot;parameter&quot;,{userId:userId}).flushAsync();&#xD;
 			dgQuotaItemViewMap.refresh();&#xD;
 		}else{&#xD;
-			alert(&quot;执行失败！发生异常：&quot; + obj)&#xD;
+			
 		}&#xD;
 	}&#xD;
 })</ClientEvent>
@@ -293,6 +289,15 @@ uaQuotaItemViewMap.execute({&#xD;
               </ToolBarButton>
             </ToolBar>
             <DataGrid id="dgQuotaItemViewMap">
+              <ClientEvent name="onContextMenu">var muUpdateViewMaps1=view.get(&quot;#muUpdateViewMaps1&quot;);&#xD;
+muUpdateViewMaps1.show(&#xD;
+	{&#xD;
+		position:{&#xD;
+			left:arg.event.pageX,&#xD;
+			top:arg.event.pageY&#xD;
+		}&#xD;
+	}&#xD;
+);</ClientEvent>
               <Property name="dataSet">dsQuotaItemViewMap</Property>
               <Property name="dataType">QuotaItemViewMap</Property>
               <Property name="dynaRowHeight">true</Property>
@@ -301,7 +306,6 @@ uaQuotaItemViewMap.execute({&#xD;
               <Property name="filterMode">serverSide</Property>
               <RowNumColumn/>
               <IndicatorColumn/>
-              <RowSelectorColumn/>
               <DataColumn name="id">
                 <Property name="property">id</Property>
                 <Property name="visible">false</Property>
@@ -326,9 +330,19 @@ uaQuotaItemViewMap.execute({&#xD;
                 <Property name="caption">指标</Property>
                 <Property name="align">center</Property>
                 <Property name="width">200</Property>
-                <Property name="editable">false</Property>
+                <Property name="editable">true</Property>
                 <Property name="name">quotaTypeName</Property>
                 <Property name="readOnly">true</Property>
+                <Editor/>
+              </DataColumn>
+              <DataColumn>
+                <Property name="name">quotaProfessionName</Property>
+                <Property name="property">quotaType.quotaProfession.name</Property>
+                <Property name="align">center</Property>
+                <Property name="caption">专业</Property>
+                <Property name="readOnly">true</Property>
+                <Property name="width">100</Property>
+                <Property name="editable">true</Property>
                 <Editor/>
               </DataColumn>
               <DataColumn>
@@ -336,7 +350,7 @@ uaQuotaItemViewMap.execute({&#xD;
                 <Property name="caption">管理部门</Property>
                 <Property name="align">center</Property>
                 <Property name="width">100</Property>
-                <Property name="editable">false</Property>
+                <Property name="editable">true</Property>
                 <Property name="name">manageDeptName</Property>
                 <Property name="readOnly">true</Property>
                 <Editor/>
@@ -346,7 +360,7 @@ uaQuotaItemViewMap.execute({&#xD;
                 <Property name="caption">级别</Property>
                 <Property name="align">center</Property>
                 <Property name="width">60</Property>
-                <Property name="editable">false</Property>
+                <Property name="editable">true</Property>
                 <Property name="name">quotaTypeLevelName</Property>
                 <Property name="readOnly">true</Property>
                 <Editor/>
@@ -356,7 +370,7 @@ uaQuotaItemViewMap.execute({&#xD;
                 <Property name="caption">频率</Property>
                 <Property name="align">center</Property>
                 <Property name="width">60</Property>
-                <Property name="editable">false</Property>
+                <Property name="editable">true</Property>
                 <Property name="name">rate</Property>
                 <Property name="readOnly">true</Property>
                 <Editor/>
@@ -376,7 +390,7 @@ uaQuotaItemViewMap.execute({&#xD;
                 <Property name="align">center</Property>
                 <Property name="width">65</Property>
                 <Property name="name">quotaCoverName</Property>
-                <Property name="editable">false</Property>
+                <Property name="editable">true</Property>
                 <Property name="readOnly">true</Property>
                 <Editor/>
               </DataColumn>
@@ -385,8 +399,8 @@ uaQuotaItemViewMap.execute({&#xD;
                 <Property name="align">center</Property>
                 <Property name="caption">可见</Property>
                 <Property name="width">60</Property>
-                <Property name="visible">false</Property>
-                <Property name="readOnly">true</Property>
+                <Property name="visible">true</Property>
+                <Property name="readOnly">false</Property>
               </DataColumn>
               <DataColumn name="defaultView">
                 <Property name="property">defaultView</Property>
@@ -415,9 +429,11 @@ uaQuotaItemViewMap.execute({&#xD;
                     <ToolBarButton>
                       <ClientEvent name="onClick">var dgUser=view.get(&quot;#dgUser&quot;);&#xD;
 var user=dgUser.getCurrentItem();&#xD;
+var userId=user.get(&quot;username&quot;);&#xD;
 var dgQuotaItemCreatorForSelect=view.get(&quot;#dgQuotaItemCreatorForSelect&quot;);&#xD;
 var dgQuotaItemViewMap=view.get(&quot;#dgQuotaItemViewMap&quot;);&#xD;
-var datas = view.get(&quot;#dsQuotaItemViewMap&quot;).get(&quot;data&quot;);&#xD;
+var dsQuotaItemViewMap=view.get(&quot;#dsQuotaItemViewMap&quot;);&#xD;
+var datas = dsQuotaItemViewMap.get(&quot;data&quot;);&#xD;
 var selection=dgQuotaItemCreatorForSelect.get(&quot;selection&quot;);&#xD;
 var messge;&#xD;
 &#xD;
@@ -437,12 +453,24 @@ if (selection &amp;&amp; selection.length){&#xD;
 	});&#xD;
 	dgQuotaItemViewMap.refresh();&#xD;
 	view.get(&quot;#dlgQuotaItemCreatorForSelect&quot;).hide();&#xD;
+	&#xD;
+	var uaQuotaItemViewMap=view.get(&quot;#uaQuotaItemViewMap&quot;);	&#xD;
+	uaQuotaItemViewMap.execute({&#xD;
+		callback:function(success,obj){&#xD;
+			if (success) {&#xD;
+				dsQuotaItemViewMap.set(&quot;parameter&quot;,{userId:userId}).flushAsync();&#xD;
+				dgQuotaItemViewMap.refresh();&#xD;
+			}else{&#xD;
+				
+			}&#xD;
+		}&#xD;
+	})&#xD;
 }&#xD;
 else {&#xD;
 	message = &quot;未选中指标！&quot;;&#xD;
 	dorado.MessageBox.alert(message);&#xD;
 }</ClientEvent>
-                      <Property name="caption">确定</Property>
+                      <Property name="caption">将勾选的指标设为可见</Property>
                       <Property name="icon">url(>skin>common/icons.gif) -20px 0px</Property>
                     </ToolBarButton>
                     <ToolBarButton>
@@ -457,6 +485,15 @@ dorado.MessageBox.confirm(&quot;您真的要取消当前操作吗？&quot;,funct
                     </ToolBarButton>
                   </ToolBar>
                   <DataGrid id="dgQuotaItemCreatorForSelect">
+                    <ClientEvent name="onContextMenu">var muAddCanViewMaps1=view.get(&quot;#muAddCanViewMaps1&quot;);&#xD;
+muAddCanViewMaps1.show(&#xD;
+	{&#xD;
+		position:{&#xD;
+			left:arg.event.pageX,&#xD;
+			top:arg.event.pageY&#xD;
+		}&#xD;
+	}&#xD;
+);</ClientEvent>
                     <Property name="dataSet">dsQuotaItemCreatorForSelect</Property>
                     <Property name="dataType">QuotaItemCreator</Property>
                     <Property name="selectionMode">multiRows</Property>
@@ -495,9 +532,19 @@ dorado.MessageBox.confirm(&quot;您真的要取消当前操作吗？&quot;,funct
                       <Property name="caption">指标</Property>
                       <Property name="align">center</Property>
                       <Property name="width">200</Property>
-                      <Property name="editable">false</Property>
+                      <Property name="editable">true</Property>
                       <Property name="name">quotaTypeName</Property>
                       <Property name="readOnly">true</Property>
+                      <Editor/>
+                    </DataColumn>
+                    <DataColumn>
+                      <Property name="name">quotaProfessionName</Property>
+                      <Property name="property">quotaType.quotaProfession.name</Property>
+                      <Property name="align">center</Property>
+                      <Property name="caption">专业</Property>
+                      <Property name="readOnly">true</Property>
+                      <Property name="width">100</Property>
+                      <Property name="editable">true</Property>
                       <Editor/>
                     </DataColumn>
                     <DataColumn>
@@ -505,7 +552,7 @@ dorado.MessageBox.confirm(&quot;您真的要取消当前操作吗？&quot;,funct
                       <Property name="caption">管理部门</Property>
                       <Property name="align">center</Property>
                       <Property name="width">100</Property>
-                      <Property name="editable">false</Property>
+                      <Property name="editable">true</Property>
                       <Property name="name">manageDeptName</Property>
                       <Property name="readOnly">true</Property>
                       <Editor/>
@@ -520,7 +567,7 @@ dorado.MessageBox.confirm(&quot;您真的要取消当前操作吗？&quot;,funct
                       <Property name="caption">责任部门</Property>
                       <Property name="align">center</Property>
                       <Property name="width">100</Property>
-                      <Property name="editable">false</Property>
+                      <Property name="editable">true</Property>
                       <Property name="name">quotaDutyDeptName</Property>
                       <Property name="readOnly">true</Property>
                       <Editor/>
@@ -530,7 +577,7 @@ dorado.MessageBox.confirm(&quot;您真的要取消当前操作吗？&quot;,funct
                       <Property name="caption">级别</Property>
                       <Property name="align">center</Property>
                       <Property name="width">60</Property>
-                      <Property name="editable">false</Property>
+                      <Property name="editable">true</Property>
                       <Property name="name">quotaTypeLevelName</Property>
                       <Property name="readOnly">true</Property>
                       <Editor/>
@@ -540,7 +587,7 @@ dorado.MessageBox.confirm(&quot;您真的要取消当前操作吗？&quot;,funct
                       <Property name="caption">频率</Property>
                       <Property name="align">center</Property>
                       <Property name="width">60</Property>
-                      <Property name="editable">false</Property>
+                      <Property name="editable">true</Property>
                       <Property name="name">rate</Property>
                       <Property name="readOnly">true</Property>
                       <Editor/>
@@ -560,11 +607,40 @@ dorado.MessageBox.confirm(&quot;您真的要取消当前操作吗？&quot;,funct
                       <Property name="align">center</Property>
                       <Property name="width">65</Property>
                       <Property name="name">quotaCoverName</Property>
-                      <Property name="editable">false</Property>
+                      <Property name="editable">true</Property>
                       <Property name="readOnly">true</Property>
                       <Editor/>
                     </DataColumn>
                   </DataGrid>
+                  <Menu id="muAddCanViewMaps1">
+                    <MenuItem>
+                      <ClientEvent name="onClick">var dgUser=view.get(&quot;#dgUser&quot;);&#xD;
+var currentUser=dgUser.getCurrentItem();&#xD;
+userId=currentUser.get(&quot;username&quot;);&#xD;
+&#xD;
+var dialog=view.get(&quot;#dlgQuotaItemCreatorForSelect&quot;);&#xD;
+var aaAddQuotaItemViewMapsCanView=view.get(&quot;#aaAddQuotaItemViewMapsCanView&quot;);&#xD;
+&#xD;
+aaAddQuotaItemViewMapsCanView.set(&quot;parameter&quot;,{userId:userId});&#xD;
+aaAddQuotaItemViewMapsCanView.execute({&#xD;
+	callback : function(success, obj){&#xD;
+		if (success) {&#xD;
+			dialog.hide();&#xD;
+			var dgQuotaItemViewMap=view.get(&quot;#dgQuotaItemViewMap&quot;);&#xD;
+			var dsQuotaItemViewMap=view.get(&quot;#dsQuotaItemViewMap&quot;);&#xD;
+			&#xD;
+			dsQuotaItemViewMap.set(&quot;parameter&quot;,{userId:userId}).flushAsync();&#xD;
+			dgQuotaItemViewMap.refresh();&#xD;
+        }&#xD;
+		else{}}&#xD;
+});</ClientEvent>
+                      <Property name="caption">设置当前筛选出的指标为可见</Property>
+                      <Property name="icon">url(>skin>common/icons.gif) -180px -100px</Property>
+                    </MenuItem>
+                  </Menu>
+                  <AjaxAction id="aaAddQuotaItemViewMapsCanView">
+                    <Property name="service">quotaItemViewMapDao#addQuotaItemViewMapsCanView</Property>
+                  </AjaxAction>
                 </Container>
               </Children>
               <Tools/>
@@ -704,7 +780,7 @@ aaInitQuotaItemViewMapsByAll.execute({&#xD;
 		if (success) {&#xD;
 			&#xD;
         }&#xD;
-		else{alert(&quot;发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 });</ClientEvent>
           <Property name="caption">初始化查看范围（全部）</Property>
           <Property name="icon">url(>skin>common/icons.gif) -180px -100px</Property>
@@ -721,9 +797,40 @@ aaInitQuotaItemViewMapsByDept.execute({&#xD;
 		if (success) {&#xD;
 			&#xD;
         }&#xD;
-		else{alert(&quot;发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 });</ClientEvent>
           <Property name="caption">初始化查看范围（按部门）</Property>
+          <Property name="icon">url(>skin>common/icons.gif) -180px -100px</Property>
+        </MenuItem>
+        <Separator/>
+        <MenuItem>
+          <ClientEvent name="onClick">var aaInitQuotaItemViewMapsByAllWithAll=view.get(&quot;#aaInitQuotaItemViewMapsByAllWithAll&quot;);&#xD;
+&#xD;
+aaInitQuotaItemViewMapsByAllWithAll.execute({&#xD;
+	callback : function(success, obj){&#xD;
+		if (success) {&#xD;
+			&#xD;
+        }&#xD;
+		else{}}&#xD;
+});</ClientEvent>
+          <Property name="caption">初始化查看范围（全部-全局指标可见）</Property>
+          <Property name="icon">url(>skin>common/icons.gif) -180px -100px</Property>
+        </MenuItem>
+        <MenuItem>
+          <ClientEvent name="onClick">var aaInitQuotaItemViewMapsByDeptWithAll=view.get(&quot;#aaInitQuotaItemViewMapsByDeptWithAll&quot;);&#xD;
+var dtrDepartment=view.get(&quot;#dtrDepartment&quot;);&#xD;
+var currentDepartment=dtrDepartment.get(&quot;currentEntity&quot;);&#xD;
+deptId=currentDepartment.get(&quot;id&quot;);&#xD;
+&#xD;
+aaInitQuotaItemViewMapsByDeptWithAll.set(&quot;parameter&quot;,{deptId:deptId});&#xD;
+aaInitQuotaItemViewMapsByDeptWithAll.execute({&#xD;
+	callback : function(success, obj){&#xD;
+		if (success) {&#xD;
+			&#xD;
+        }&#xD;
+		else{}}&#xD;
+});</ClientEvent>
+          <Property name="caption">初始化查看范围（按部门-全局指标可见）</Property>
           <Property name="icon">url(>skin>common/icons.gif) -180px -100px</Property>
         </MenuItem>
       </Menu>
@@ -741,9 +848,96 @@ aaInitQuotaItemViewMapsByUser.execute({&#xD;
 			var dsQuotaItemViewMap=view.get(&quot;#dsQuotaItemViewMap&quot;);&#xD;
 			dsQuotaItemViewMap.set(&quot;parameter&quot;,{userId:userId}).flushAsync();&#xD;
         }&#xD;
-		else{alert(&quot;发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 });</ClientEvent>
           <Property name="caption">初始化查看范围（按用户）</Property>
+          <Property name="icon">url(>skin>common/icons.gif) -180px -100px</Property>
+        </MenuItem>
+        <Separator/>
+        <MenuItem>
+          <ClientEvent name="onClick">var aaInitQuotaItemViewMapsByUserWithAll=view.get(&quot;#aaInitQuotaItemViewMapsByUserWithAll&quot;);&#xD;
+var dgUser=view.get(&quot;#dgUser&quot;);&#xD;
+var currentUser=dgUser.getCurrentItem();&#xD;
+userId=currentUser.get(&quot;username&quot;);&#xD;
+&#xD;
+aaInitQuotaItemViewMapsByUserWithAll.set(&quot;parameter&quot;,{userId:userId});&#xD;
+aaInitQuotaItemViewMapsByUserWithAll.execute({&#xD;
+	callback : function(success, obj){&#xD;
+		if (success) {&#xD;
+			var dsQuotaItemViewMap=view.get(&quot;#dsQuotaItemViewMap&quot;);&#xD;
+			dsQuotaItemViewMap.set(&quot;parameter&quot;,{userId:userId}).flushAsync();&#xD;
+        }&#xD;
+		else{}}&#xD;
+});</ClientEvent>
+          <Property name="caption">初始化查看范围（按用户-全局指标可见）</Property>
+          <Property name="icon">url(>skin>common/icons.gif) -180px -100px</Property>
+        </MenuItem>
+      </Menu>
+      <Menu id="muUpdateViewMaps1">
+        <MenuItem>
+          <ClientEvent name="onClick">var dgUser=view.get(&quot;#dgUser&quot;);&#xD;
+var currentUser=dgUser.getCurrentItem();&#xD;
+userId=currentUser.get(&quot;username&quot;);&#xD;
+&#xD;
+var aaUpdateQuotaItemViewMapsDefaultView=view.get(&quot;#aaUpdateQuotaItemViewMapsDefaultView&quot;);&#xD;
+&#xD;
+aaUpdateQuotaItemViewMapsDefaultView.set(&quot;parameter&quot;,{userId:userId,isDefaultToView:true});&#xD;
+aaUpdateQuotaItemViewMapsDefaultView.execute({&#xD;
+	callback : function(success, obj){&#xD;
+		if (success) {&#xD;
+			var dgQuotaItemViewMap=view.get(&quot;#dgQuotaItemViewMap&quot;);&#xD;
+			var dsQuotaItemViewMap=view.get(&quot;#dsQuotaItemViewMap&quot;);&#xD;
+			&#xD;
+			dsQuotaItemViewMap.set(&quot;parameter&quot;,{userId:userId}).flushAsync();&#xD;
+			dgQuotaItemViewMap.refresh();&#xD;
+        }&#xD;
+		else{}}&#xD;
+});</ClientEvent>
+          <Property name="caption">设置当前筛选出的指标为默认</Property>
+          <Property name="icon">url(>skin>common/icons.gif) -180px -100px</Property>
+        </MenuItem>
+        <MenuItem>
+          <ClientEvent name="onClick">var dgUser=view.get(&quot;#dgUser&quot;);&#xD;
+var currentUser=dgUser.getCurrentItem();&#xD;
+userId=currentUser.get(&quot;username&quot;);&#xD;
+&#xD;
+var aaUpdateQuotaItemViewMapsDefaultView=view.get(&quot;#aaUpdateQuotaItemViewMapsDefaultView&quot;);&#xD;
+&#xD;
+aaUpdateQuotaItemViewMapsDefaultView.set(&quot;parameter&quot;,{userId:userId,isDefaultToView:false});&#xD;
+aaUpdateQuotaItemViewMapsDefaultView.execute({&#xD;
+	callback : function(success, obj){&#xD;
+		if (success) {&#xD;
+			var dgQuotaItemViewMap=view.get(&quot;#dgQuotaItemViewMap&quot;);&#xD;
+			var dsQuotaItemViewMap=view.get(&quot;#dsQuotaItemViewMap&quot;);&#xD;
+			&#xD;
+			dsQuotaItemViewMap.set(&quot;parameter&quot;,{userId:userId}).flushAsync();&#xD;
+			dgQuotaItemViewMap.refresh();&#xD;
+        }&#xD;
+		else{}}&#xD;
+});</ClientEvent>
+          <Property name="caption">设置当前筛选出的指标为不默认</Property>
+          <Property name="icon">url(>skin>common/icons.gif) -180px -100px</Property>
+        </MenuItem>
+        <MenuItem>
+          <ClientEvent name="onClick">var dgUser=view.get(&quot;#dgUser&quot;);&#xD;
+var currentUser=dgUser.getCurrentItem();&#xD;
+userId=currentUser.get(&quot;username&quot;);&#xD;
+&#xD;
+var aaUpdateQuotaItemViewMapsCanView=view.get(&quot;#aaUpdateQuotaItemViewMapsCanView&quot;);&#xD;
+&#xD;
+aaUpdateQuotaItemViewMapsCanView.set(&quot;parameter&quot;,{userId:userId,isCanView:false});&#xD;
+aaUpdateQuotaItemViewMapsCanView.execute({&#xD;
+	callback : function(success, obj){&#xD;
+		if (success) {&#xD;
+			var dgQuotaItemViewMap=view.get(&quot;#dgQuotaItemViewMap&quot;);&#xD;
+			var dsQuotaItemViewMap=view.get(&quot;#dsQuotaItemViewMap&quot;);&#xD;
+			&#xD;
+			dsQuotaItemViewMap.set(&quot;parameter&quot;,{userId:userId}).flushAsync();&#xD;
+			dgQuotaItemViewMap.refresh();&#xD;
+        }&#xD;
+		else{}}&#xD;
+});</ClientEvent>
+          <Property name="caption">设置当前筛选出的指标为不可见</Property>
           <Property name="icon">url(>skin>common/icons.gif) -180px -100px</Property>
         </MenuItem>
       </Menu>
@@ -756,6 +950,21 @@ aaInitQuotaItemViewMapsByUser.execute({&#xD;
     </AjaxAction>
     <AjaxAction id="aaInitQuotaItemViewMapsByUser">
       <Property name="service">quotaItemViewMapDao#initQuotaItemViewMapsByUser</Property>
+    </AjaxAction>
+    <AjaxAction id="aaInitQuotaItemViewMapsByUserWithAll">
+      <Property name="service">quotaItemViewMapDao#initQuotaItemViewMapsByUserWithAll</Property>
+    </AjaxAction>
+    <AjaxAction id="aaInitQuotaItemViewMapsByDeptWithAll">
+      <Property name="service">quotaItemViewMapDao#initQuotaItemViewMapsByDeptWithAll</Property>
+    </AjaxAction>
+    <AjaxAction id="aaInitQuotaItemViewMapsByAllWithAll">
+      <Property name="service">quotaItemViewMapDao#initQuotaItemViewMapsByAllWithAll</Property>
+    </AjaxAction>
+    <AjaxAction id="aaUpdateQuotaItemViewMapsDefaultView">
+      <Property name="service">quotaItemViewMapDao#updateQuotaItemViewMapsDefaultView</Property>
+    </AjaxAction>
+    <AjaxAction id="aaUpdateQuotaItemViewMapsCanView">
+      <Property name="service">quotaItemViewMapDao#updateQuotaItemViewMapsCanView</Property>
     </AjaxAction>
   </View>
 </ViewConfig>

@@ -34,6 +34,7 @@ import com.bstek.dorado.data.type.property.PropertyDef;
 import com.bstek.dorado.data.variant.Record;
 import com.bstek.dorado.view.manager.ViewConfig;
 import com.bstek.dorado.view.widget.Align;
+import com.bstek.dorado.view.widget.base.Tip;
 import com.bstek.dorado.view.widget.grid.ColumnGroup;
 import com.bstek.dorado.view.widget.grid.DataColumn;
 import com.bstek.dorado.view.widget.grid.DataGrid;
@@ -328,6 +329,7 @@ public class ResultGridCreator extends HibernateDao{
 				QuotaItemViewTableManage quotaItemViewTableManage=quotaItemViewTableManageDao.getItemViewTableManageByYear(year);
 				if (quotaItemViewTableManage!=null) {
 					String tableName=quotaItemViewTableManage.getTableName();
+		
 					ResultSet rs=getResultSet(conn,"select * from "+tableName+" limit 0,1");
 					ResultSetMetaData rsm=rs.getMetaData();
 					
@@ -335,9 +337,18 @@ public class ResultGridCreator extends HibernateDao{
 					String queryString = null;
 					List resultList=new ArrayList<>();
 					
+					Collection<ShowColumn> showColumns=showColumnDao.getShowColumnsByQuotaItemViewTableManage(quotaItemViewTableManage.getId());
+					for (ShowColumn showColumn : showColumns) {
+						String showColumnName=showColumn.getName();
+						String filterMapColumnName=showColumn.getFilterMapColumnName();
+						if (!showColumnName.equals(filterMapColumnName)) {
+							filterString=filterString.replaceAll(" "+showColumnName+" ", " "+filterMapColumnName+" ");
+						}
+					}
+					
 					if (loginuser.isAdministrator()) {
 						switch (month) {
-						case 13:
+						case 13: 
 							queryString="select * from "+tableName+" where 考核频率='月'"+filterString;
 							break;
 						case 14:
@@ -354,68 +365,89 @@ public class ResultGridCreator extends HibernateDao{
 							queryString="select * from "+tableName+" where 月度="+month+filterString;
 							break;
 						}
-						resultList=getQueryResults(queryString);
-						queryString=null;
 					}else {
 						String userId=loginuser.getUsername();
-						Collection<QuotaItemViewMap> quotaItemViewMaps=quotaItemViewMapDao.getQuotaItemViewMapsByUser(userId);
-						
-						if (quotaItemViewMaps.size()>0) {
-							if (viewscope.equals("default")) {
-								for (QuotaItemViewMap quotaItemViewMap : quotaItemViewMaps) {
-									String quotaTypeId=quotaItemViewMap.getQuotaType().getId();
-									String quotaCoverId=quotaItemViewMap.getQuotaCover().getId();
-									if (quotaItemViewMap.isDefaultView()==true) {
-										switch (month) {
-										case 13:
-											queryString="select * from "+tableName+" where 考核频率='月' and 指标种类id='"+quotaTypeId+"' and 口径id='"+quotaCoverId+"'"+filterString;
-											break;
-										case 14:
-											queryString="select * from "+tableName+" where 考核频率='年' and 指标种类id='"+quotaTypeId+"' and 口径id='"+quotaCoverId+"'"+filterString;
-											break;
-										case 15:
-											queryString="select * from "+tableName+" where 指标种类id='"+quotaTypeId+"' and 口径id='"+quotaCoverId+"'"+filterString;
-											break;
-										default:
-											queryString="select * from "+tableName+" where 月度="+month+" and 指标种类id='"+quotaTypeId+"' and 口径id='"+quotaCoverId+"'"+filterString;
-											break;
-										}
-										List list=getQueryResults(queryString);
-										if (list.size()>0) {
-											resultList.addAll(list);
-										}
-										queryString=null;
-									}
-								}
-							}else if (viewscope.equals("can")) {
-								for (QuotaItemViewMap quotaItemViewMap : quotaItemViewMaps) {
-									String quotaTypeId=quotaItemViewMap.getQuotaType().getId();
-									String quotaCoverId=quotaItemViewMap.getQuotaCover().getId();
-									if (quotaItemViewMap.isCanView()==true) {
-										switch (month) {
-										case 13:
-											queryString="select * from "+tableName+" where 考核频率='月' and 指标种类id='"+quotaTypeId+"' and 口径id='"+quotaCoverId+"'"+filterString;
-											break;
-										case 14:
-											queryString="select * from "+tableName+" where 考核频率='年' and 指标种类id='"+quotaTypeId+"' and 口径id='"+quotaCoverId+"'"+filterString;
-											break;
-										case 15:
-											queryString="select * from "+tableName+" where 指标种类id='"+quotaTypeId+"' and 口径id='"+quotaCoverId+"'"+filterString;
-											break;
-										default:
-											queryString="select * from "+tableName+" where 月度="+month+" and 指标种类id='"+quotaTypeId+"' and 口径id='"+quotaCoverId+"'"+filterString;
-											break;
-										}
-										List list=getQueryResults(queryString);
-										if (list.size()>0) {
-											resultList.addAll(list);
-										}
-										queryString=null;
-									}		
-								}
-							}						
-						}
+						if (viewscope.equals("default")) {
+							switch (month) {
+							case 13:											
+								queryString="SELECT "+tableName+".* FROM "+tableName
+										+" INNER JOIN quota_item_view_map ON "
+										+tableName+".`指标种类id` = quota_item_view_map.QUOTA_TYPE_ID AND "
+										+tableName+".`口径id` = quota_item_view_map.QUOTA_COVER_ID WHERE quota_item_view_map.USER_ID = '"+userId+"' AND "
+										+tableName+".考核频率='月'"
+										+" AND quota_item_view_map.DEFAULT_VIEW=true"
+										+filterString;
+								break;
+							case 14:
+								queryString="SELECT "+tableName+".* FROM "+tableName
+										+" INNER JOIN quota_item_view_map ON "
+										+tableName+".`指标种类id` = quota_item_view_map.QUOTA_TYPE_ID AND "
+										+tableName+".`口径id` = quota_item_view_map.QUOTA_COVER_ID WHERE quota_item_view_map.USER_ID = '"+userId+"' AND "
+										+tableName+".考核频率='年'"
+										+" AND quota_item_view_map.DEFAULT_VIEW=true"
+										+filterString;
+								break;
+							case 15:
+								queryString="SELECT "+tableName+".* FROM "+tableName
+										+" INNER JOIN quota_item_view_map ON "
+										+tableName+".`指标种类id` = quota_item_view_map.QUOTA_TYPE_ID AND "
+										+tableName+".`口径id` = quota_item_view_map.QUOTA_COVER_ID WHERE quota_item_view_map.USER_ID = '"+userId+"'"
+										+" AND quota_item_view_map.DEFAULT_VIEW=true"
+										+filterString;
+								break;
+							default:
+								queryString="SELECT "+tableName+".* FROM "+tableName
+										+" INNER JOIN quota_item_view_map ON "
+										+tableName+".`指标种类id` = quota_item_view_map.QUOTA_TYPE_ID AND "
+										+tableName+".`口径id` = quota_item_view_map.QUOTA_COVER_ID WHERE quota_item_view_map.USER_ID = '"+userId+"' AND "
+										+tableName+".月度="+month
+										+" AND quota_item_view_map.DEFAULT_VIEW=true"
+										+filterString;
+								break;
+							}
+						}else if (viewscope.equals("can")) {
+							switch (month) {
+							case 13:											
+								queryString="SELECT "+tableName+".* FROM "+tableName
+										+" INNER JOIN quota_item_view_map ON "
+										+tableName+".`指标种类id` = quota_item_view_map.QUOTA_TYPE_ID AND "
+										+tableName+".`口径id` = quota_item_view_map.QUOTA_COVER_ID WHERE quota_item_view_map.USER_ID = '"+userId+"' AND "
+										+tableName+".考核频率='月'"
+										+" AND quota_item_view_map.CAN_VIEW=true"
+										+filterString;
+								break;
+							case 14:
+								queryString="SELECT "+tableName+".* FROM "+tableName
+										+" INNER JOIN quota_item_view_map ON "
+										+tableName+".`指标种类id` = quota_item_view_map.QUOTA_TYPE_ID AND "
+										+tableName+".`口径id` = quota_item_view_map.QUOTA_COVER_ID WHERE quota_item_view_map.USER_ID = '"+userId+"' AND "
+										+tableName+".考核频率='年'"
+										+" AND quota_item_view_map.CAN_VIEW=true"
+										+filterString;
+								break;
+							case 15:
+								queryString="SELECT "+tableName+".* FROM "+tableName
+										+" INNER JOIN quota_item_view_map ON "
+										+tableName+".`指标种类id` = quota_item_view_map.QUOTA_TYPE_ID AND "
+										+tableName+".`口径id` = quota_item_view_map.QUOTA_COVER_ID WHERE quota_item_view_map.USER_ID = '"+userId+"'"
+										+" AND quota_item_view_map.CAN_VIEW=true"
+										+filterString;
+								break;
+							default:
+								queryString="SELECT "+tableName+".* FROM "+tableName
+										+" INNER JOIN quota_item_view_map ON "
+										+tableName+".`指标种类id` = quota_item_view_map.QUOTA_TYPE_ID AND "
+										+tableName+".`口径id` = quota_item_view_map.QUOTA_COVER_ID WHERE quota_item_view_map.USER_ID = '"+userId+"' AND "
+										+tableName+".月度="+month
+										+" AND quota_item_view_map.CAN_VIEW=true"
+										+filterString;
+								break;
+							}
+						}		
 					}
+					
+					resultList=getQueryResults(queryString);
+					queryString=null;
 					
 					int i=0;
 					int j=0;

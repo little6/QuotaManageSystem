@@ -328,9 +328,7 @@ public class QuotaItemDao extends HibernateDao {
 	public Collection<QuotaItem> getQuotaItemsByQuotaItemCreator(
 			String quotaItemCreatorId) {
 		String hqlString = "from " + QuotaItem.class.getName()
-				+ " where quotaItemCreator.id='" + quotaItemCreatorId + "'"
-				+" order by quotaItemCreator.quotaType.quotaLevel.level asc,quotaItemCreator.name,year asc,month asc,"
-				+"quotaItemCreator.quotaCover.sort asc";
+				+ " where quotaItemCreator.id='" + quotaItemCreatorId + "'";
 		Collection<QuotaItem> quotaItems = this.query(hqlString);
 		return quotaItems;
 	}

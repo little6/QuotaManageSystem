@@ -152,7 +152,7 @@ uaShowColumnLinked.execute({&#xD;
 			dsShowColumn.set(&quot;parameter&quot;,{quotaItemViewTableManageId:quotaItemViewTableManageId}).flushAsync();&#xD;
 			dgShowColumnLinked.refresh();&#xD;
 		}else{&#xD;
-			alert(&quot;执行失败！发生异常：&quot; + obj)&#xD;
+			
 		}&#xD;
 	}&#xD;
 })&#xD;

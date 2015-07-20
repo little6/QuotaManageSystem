@@ -98,8 +98,7 @@ public class QuotaItemCreatorDao extends HibernateDao {
 	public Collection<QuotaItemCreator> getQuotaItemCreatorsByQuotaType(
 			String quotaTypeId) {
 		String hqlString = "from " + QuotaItemCreator.class.getName()
-				+ " where quotaType.id='" + quotaTypeId + "'"
-				+" order by quotaType.quotaLevel.level asc,quotaType.name asc,quotaCover.sort asc";
+				+ " where quotaType.id='" + quotaTypeId + "'";
 		Collection<QuotaItemCreator> quotaItemCreators = this.query(hqlString);
 		return quotaItemCreators;
 	}
@@ -472,7 +471,7 @@ public class QuotaItemCreatorDao extends HibernateDao {
 					switch (rate) {
 					case "Äê": {
 						QuotaItem quotaItem = new QuotaItem();
-						quotaItem.setYear(quotaItemCreator.getYear());
+						quotaItem.setYear(quotaItemCreator.getYear()); 
 						quotaItem.setQuotaItemCreator(quotaItemCreator);
 						quotaItem.setOverTime(false);
 						quotaItem.setAllowSubmit(false);

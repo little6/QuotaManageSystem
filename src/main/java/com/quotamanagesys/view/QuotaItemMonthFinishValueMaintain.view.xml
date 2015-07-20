@@ -144,7 +144,7 @@ uaQuotaItem.execute({&#xD;
 				dlgQuotaItemNotAllowSubmit.show();&#xD;
 			}&#xD;
 		} else {&#xD;
-			alert(&quot;发生异常：&quot; + obj);&#xD;
+			
 		}&#xD;
 	}&#xD;
 });</ClientEvent>

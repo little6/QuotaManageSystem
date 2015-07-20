@@ -53,6 +53,11 @@ public class QuotaType implements Serializable{
 	private QuotaType fatherQuotaType;//上级指标种类
 	@Column(name="IS_USED")
 	private boolean inUsed;//指标种类使用状态
+	@Column(name="CALC_FORMULA_INFO")
+	private String calculationFormulaInfo;//计算公式定义
+	@Column(name="QUOTA_DEF_INFO")
+	private String quotaDefinitionInfo;//指标定义
+	
 	public String getId() {
 		return id;
 	}
@@ -118,6 +123,18 @@ public class QuotaType implements Serializable{
 	}
 	public void setInUsed(boolean inUsed) {
 		this.inUsed = inUsed;
+	}
+	public String getCalculationFormulaInfo() {
+		return calculationFormulaInfo;
+	}
+	public void setCalculationFormulaInfo(String calculationFormulaInfo) {
+		this.calculationFormulaInfo = calculationFormulaInfo;
+	}
+	public String getQuotaDefinitionInfo() {
+		return quotaDefinitionInfo;
+	}
+	public void setQuotaDefinitionInfo(String quotaDefinitionInfo) {
+		this.quotaDefinitionInfo = quotaDefinitionInfo;
 	}
 	
 }

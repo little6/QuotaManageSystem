@@ -39,6 +39,9 @@
       <PropertyDef name="showColumnTrigger">
         <Property name="dataType">ShowColumnTrigger</Property>
       </PropertyDef>
+      <PropertyDef name="filterMapColumnName">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
     </DataType>
     <DataType name="ShowColumnGroup">
       <Property name="creationType">com.quotamanagesys.model.ShowColumnGroup</Property>
@@ -145,7 +148,7 @@ aaInitShowColumn.execute({&#xD;
 			dsShowColumn.flush();&#xD;
 			dgShowColumn.refresh();&#xD;
         }&#xD;
-		else{alert(&quot;抽取数据表字段失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 });</ClientEvent>
                 <Property name="icon">url(>skin>common/icons.gif) -280px -240px</Property>
                 <Property name="caption">抽取表格字段</Property>
@@ -173,7 +176,7 @@ uaShowColumn.execute({&#xD;
 			dsShowColumn.flush();&#xD;
 			dgShowColumn.refresh();&#xD;
         }&#xD;
-		else{alert(&quot;执行失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 });&#xD;
 &#xD;
 </ClientEvent>
@@ -210,6 +213,13 @@ uaShowColumn.execute({&#xD;
                 <Property name="caption">别名</Property>
                 <Property name="width">130</Property>
                 <Property name="wrappable">true</Property>
+              </DataColumn>
+              <DataColumn name="filterMapColumnName">
+                <Property name="property">filterMapColumnName</Property>
+                <Property name="width">130</Property>
+                <Property name="wrappable">true</Property>
+                <Property name="align">center</Property>
+                <Property name="caption">筛选对应列</Property>
               </DataColumn>
               <DataColumn name="showColumnGroup">
                 <Property name="property">showColumnGroup</Property>
@@ -394,7 +404,7 @@ aaCopyShowColumn.execute({&#xD;
 			dsShowColumn.set(&quot;parameter&quot;,{quotaItemViewTableManageId:toId}).flushAsync();&#xD;
 			view.get(&quot;#dlgQuotaItemViewTableManage&quot;).hide();&#xD;
         }&#xD;
-		else{alert(&quot; 复制列配置失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 });&#xD;
 &#xD;
 </ClientEvent>

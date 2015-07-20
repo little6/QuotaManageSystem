@@ -33,6 +33,12 @@
     <PropertyDef name="inUsed">
       <Property name="dataType">boolean</Property>
     </PropertyDef>
+    <PropertyDef name="calculationFormulaInfo">
+      <Property name="dataType">String</Property>
+    </PropertyDef>
+    <PropertyDef name="quotaDefinitionInfo">
+      <Property name="dataType">String</Property>
+    </PropertyDef>
   </DataType>
   <DataType name="QuotaProfession" meta="x:375;y:30">
     <Property name="creationType">com.quotamanagesys.model.QuotaProfession</Property>

@@ -113,6 +113,12 @@
       <PropertyDef name="inUsed">
         <Property name="dataType">boolean</Property>
       </PropertyDef>
+      <PropertyDef name="calculationFormulaInfo">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="quotaDefinitionInfo">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
     </DataType>
     <DataType name="QuotaProfession" meta="x:375;y:30">
       <Property name="creationType">com.quotamanagesys.model.QuotaProfession</Property>
@@ -216,6 +222,11 @@
       <Property name="dataType">[DropDownType]</Property>
       <Property name="dataProvider">dropDownDataCreator#getDropDownData</Property>
     </DataSet>
+    <DataSet id="dsQuotaProfession">
+      <ClientEvent name="beforeLoadData">self.set(&quot;parameter&quot;,{columnName:&quot;指标专业&quot;});</ClientEvent>
+      <Property name="dataType">[DropDownType]</Property>
+      <Property name="dataProvider">dropDownDataCreator#getDropDownData</Property>
+    </DataSet>
     <DataSet id="dsManageDept">
       <ClientEvent name="beforeLoadData">self.set(&quot;parameter&quot;,{columnName:&quot;管理部门&quot;});</ClientEvent>
       <Property name="dataType">[DropDownType]</Property>
@@ -225,6 +236,10 @@
       <ClientEvent name="beforeLoadData">self.set(&quot;parameter&quot;,{columnName:&quot;责任部门&quot;});</ClientEvent>
       <Property name="dataType">[DropDownType]</Property>
       <Property name="dataProvider">dropDownDataCreator#getDropDownData</Property>
+    </DataSet>
+    <DataSet id="dsThisQuotaType">
+      <Property name="dataType">QuotaType</Property>
+      <Property name="dataProvider">quotaTypeDao#getQuotaType</Property>
     </DataSet>
     <ToolBar>
       <Property name="fixRight">true</Property>
@@ -381,11 +396,11 @@ aaCalculateAll.execute({&#xD;
 					if (success) {&#xD;
 						&#xD;
 			        }&#xD;
-					else{alert(&quot;执行失败！发生异常：&quot; + obj);}&#xD;
+					else{}&#xD;
 				}&#xD;
 			});&#xD;
         }&#xD;
-		else{alert(&quot;执行失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 });</ClientEvent>
           <Property name="caption">重置全部</Property>
           <Property name="icon">url(>skin>common/icons.gif) -280px -220px</Property>
@@ -398,7 +413,7 @@ aaCalculateAll.execute({&#xD;
 		if (success) {&#xD;
 			&#xD;
         }&#xD;
-		else{alert(&quot;执行失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 });</ClientEvent>
           <Property name="caption">重置计算结果</Property>
           <Property name="icon">url(>skin>common/icons.gif) -280px -220px</Property>
@@ -411,7 +426,7 @@ aaCreateOrUpdateAll.execute({&#xD;
 		if (success) {&#xD;
 			&#xD;
         }&#xD;
-		else{alert(&quot;执行失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 });</ClientEvent>
           <Property name="caption">重置数据表</Property>
           <Property name="icon">url(>skin>common/icons.gif) -280px -220px</Property>
@@ -431,14 +446,76 @@ arg.processDefault=false;</ClientEvent>
         <Property name="caption">设置默认指标</Property>
         <Property name="icon">url(>skin>common/icons.gif) -100px -20px</Property>
       </ToolBarButton>
+      <ToolBarButton>
+        <ClientEvent name="onClick">var teYear=view.get(&quot;#teYear&quot;);&#xD;
+var year=parseInt(teYear.get(&quot;text&quot;));&#xD;
+var teMonth=view.get(&quot;#teMonth&quot;);&#xD;
+var month=teMonth.get(&quot;text&quot;);&#xD;
+switch(month){&#xD;
+	case &quot;月度&quot;:&#xD;
+		month=13;&#xD;
+		break;&#xD;
+	case &quot;年度&quot;:&#xD;
+		month=14;&#xD;
+		break;&#xD;
+	case &quot;全部&quot;:&#xD;
+		month=15;&#xD;
+		break;&#xD;
+	default:&#xD;
+		month=parseInt(teMonth.get(&quot;text&quot;));&#xD;
+		break;&#xD;
+}&#xD;
+&#xD;
+var aaWriteExcel=view.get(&quot;#aaWriteExcel&quot;);&#xD;
+aaWriteExcel.set(&quot;parameter&quot;,{year:year,month:month});&#xD;
+aaWriteExcel.execute({&#xD;
+	callback : function(success, obj){&#xD;
+		if (success) {&#xD;
+			var aaDownLoadFile=view.get(&quot;#aaDownLoadFile&quot;);&#xD;
+			aaDownLoadFile.set(&quot;parameter&quot;,{year:year,month:month});&#xD;
+			aaDownLoadFile.execute();&#xD;
+        }&#xD;
+	}&#xD;
+});</ClientEvent>
+        <Property name="caption">下载指标完成情况表</Property>
+      </ToolBarButton>
       <Fill/>
       <DataPilot>
         <Property name="itemCodes">pages,pageSize</Property>
         <Property name="dataSet">dsQuotaItemStatus</Property>
       </DataPilot>
       <Separator/>
+      <ToolBarButton>
+        <ClientEvent name="onClick">var aaDownloadHelpFile=view.get(&quot;#aaDownloadHelpFile&quot;);&#xD;
+aaDownloadHelpFile.set(&quot;parameter&quot;,{helpname:&quot;QuotaItemView&quot;});&#xD;
+aaDownloadHelpFile.execute();</ClientEvent>
+        <Property name="caption">帮助</Property>
+        <Property name="icon">url(>skin>common/icons.gif) -180px -0px</Property>
+      </ToolBarButton>
+      <Separator/>
     </ToolBar>
     <DataGrid id="dgQuotaItemStatus" listener="spring:resultGridCreator#DataGridInit">
+      <ClientEvent name="onDoubleClick">var currentQuotaItemStatus=self.getCurrentItem();&#xD;
+quotaTypeId=currentQuotaItemStatus.get(&quot;指标种类id&quot;);&#xD;
+&#xD;
+var dsThisQuotaType=view.get(&quot;#dsThisQuotaType&quot;);&#xD;
+dsThisQuotaType.set(&quot;parameter&quot;,{id:quotaTypeId});&#xD;
+dsThisQuotaType.flush();&#xD;
+&#xD;
+var dlgQuotaTypeTip=view.get(&quot;#dlgQuotaTypeTip&quot;);&#xD;
+dlgQuotaTypeTip.show();&#xD;
+var taTip=view.get(&quot;#taTip&quot;);&#xD;
+&#xD;
+var calculationFormulaInfo=dsThisQuotaType.getData().get(&quot;calculationFormulaInfo&quot;);&#xD;
+var quotaDefinitionInfo=dsThisQuotaType.getData().get(&quot;quotaDefinitionInfo&quot;);&#xD;
+if(calculationFormulaInfo==null){&#xD;
+	calculationFormulaInfo=&quot;暂无定义&quot;;&#xD;
+}&#xD;
+if(quotaDefinitionInfo==null){&#xD;
+	quotaDefinitionInfo=&quot;暂无定义&quot;;&#xD;
+}&#xD;
+var text=&quot;1、统计公式：&quot;+calculationFormulaInfo+&quot;\n&quot;+&quot;2、指标定义：&quot;+quotaDefinitionInfo+&quot;\n&quot;;&#xD;
+taTip.set(&quot;text&quot;,text);</ClientEvent>
       <Property name="readOnly">true</Property>
       <Property name="supportsPaging">false</Property>
       <Property name="showFilterBar">true</Property>
@@ -483,6 +560,16 @@ arg.processDefault=false;</ClientEvent>
         <Property name="name">value</Property>
         <Property name="property">value</Property>
         <Property name="caption">维度</Property>
+        <Editor/>
+      </DataColumn>
+    </DataSetDropDown>
+    <DataSetDropDown id="dsddQuotaProfession">
+      <Property name="dataSet">dsQuotaProfession</Property>
+      <Property name="property">value</Property>
+      <DataColumn>
+        <Property name="name">value</Property>
+        <Property name="property">value</Property>
+        <Property name="caption">专业</Property>
         <Editor/>
       </DataColumn>
     </DataSetDropDown>
@@ -649,10 +736,11 @@ arg.processDefault=false;</ClientEvent>
       <Property name="pageSize">50</Property>
     </DataSet>
     <Dialog id="dlgQuotaItemViewMap">
-      <ClientEvent name="onHide">window.location.reload();</ClientEvent>
       <Property name="width">700</Property>
       <Property name="height">450</Property>
       <Property name="caption">设置默认显示的指标</Property>
+      <Property name="shadowMode">frame</Property>
+      <Property name="floating">true</Property>
       <Buttons/>
       <Children>
         <Container>
@@ -665,6 +753,7 @@ arg.processDefault=false;</ClientEvent>
             <ToolBarButton>
               <ClientEvent name="onClick">var dsUser=view.get(&quot;#dsUser&quot;);&#xD;
 var userId=dsUser.getData().first().get(&quot;username&quot;);&#xD;
+var dlgQuotaItemViewMap=view.get(&quot;#dlgQuotaItemViewMap&quot;);&#xD;
 &#xD;
 var dgQuotaItemViewMap=view.get(&quot;#dgQuotaItemViewMap&quot;);&#xD;
 var dsQuotaItemViewMap=view.get(&quot;#dsQuotaItemViewMap&quot;);&#xD;
@@ -675,8 +764,11 @@ uaQuotaItemViewMap.execute({&#xD;
 		if (success) {&#xD;
 			dsQuotaItemViewMap.set(&quot;parameter&quot;,{userId:userId}).flushAsync();&#xD;
 			dgQuotaItemViewMap.refresh();&#xD;
+			dlgQuotaItemViewMap.hide();&#xD;
+			window.location.reload();&#xD;
 		}else{&#xD;
-			alert(&quot;执行失败！发生异常：&quot; + obj)&#xD;
+			//alert(&quot;执行失败！发生异常：&quot; + obj)&#xD;
+			dlgQuotaItemViewMap.hide();&#xD;
 		}&#xD;
 	}&#xD;
 })</ClientEvent>
@@ -685,6 +777,15 @@ uaQuotaItemViewMap.execute({&#xD;
             </ToolBarButton>
           </ToolBar>
           <DataGrid id="dgQuotaItemViewMap">
+            <ClientEvent name="onContextMenu">var muUpdateViewMaps1=view.get(&quot;#muUpdateViewMaps1&quot;);&#xD;
+muUpdateViewMaps1.show(&#xD;
+	{&#xD;
+		position:{&#xD;
+			left:arg.event.pageX,&#xD;
+			top:arg.event.pageY&#xD;
+		}&#xD;
+	}&#xD;
+);</ClientEvent>
             <Property name="dataSet">dsQuotaItemViewMap</Property>
             <Property name="dataType">QuotaItemViewMap</Property>
             <Property name="dynaRowHeight">true</Property>
@@ -720,6 +821,16 @@ uaQuotaItemViewMap.execute({&#xD;
               <Property name="editable">true</Property>
               <Property name="name">quotaTypeName</Property>
               <Property name="readOnly">true</Property>
+              <Editor/>
+            </DataColumn>
+            <DataColumn>
+              <Property name="name">quotaProfessionName</Property>
+              <Property name="property">quotaType.quotaProfession.name</Property>
+              <Property name="align">center</Property>
+              <Property name="caption">专业</Property>
+              <Property name="readOnly">true</Property>
+              <Property name="width">100</Property>
+              <Property name="editable">true</Property>
               <Editor/>
             </DataColumn>
             <DataColumn>
@@ -795,9 +906,84 @@ uaQuotaItemViewMap.execute({&#xD;
               <Property name="dataSet">dsQuotaItemViewMap</Property>
             </UpdateItem>
           </UpdateAction>
+          <AjaxAction id="aaUpdateQuotaItemViewMapsDefaultView">
+            <Property name="service">quotaItemViewMapDao#updateQuotaItemViewMapsDefaultView</Property>
+          </AjaxAction>
+          <Menu id="muUpdateViewMaps1">
+            <MenuItem>
+              <ClientEvent name="onClick">var dsUser=view.get(&quot;#dsUser&quot;);&#xD;
+var userId=dsUser.getData().first().get(&quot;username&quot;);&#xD;
+&#xD;
+var aaUpdateQuotaItemViewMapsDefaultView=view.get(&quot;#aaUpdateQuotaItemViewMapsDefaultView&quot;);&#xD;
+&#xD;
+aaUpdateQuotaItemViewMapsDefaultView.set(&quot;parameter&quot;,{userId:userId,isDefaultToView:true});&#xD;
+aaUpdateQuotaItemViewMapsDefaultView.execute({&#xD;
+	callback : function(success, obj){&#xD;
+		if (success) {&#xD;
+			var dgQuotaItemViewMap=view.get(&quot;#dgQuotaItemViewMap&quot;);&#xD;
+			var dsQuotaItemViewMap=view.get(&quot;#dsQuotaItemViewMap&quot;);&#xD;
+			&#xD;
+			dsQuotaItemViewMap.set(&quot;parameter&quot;,{userId:userId}).flushAsync();&#xD;
+			dgQuotaItemViewMap.refresh();&#xD;
+        }&#xD;
+		else{}}&#xD;
+});</ClientEvent>
+              <Property name="caption">设置当前筛选出的指标为默认</Property>
+              <Property name="icon">url(>skin>common/icons.gif) -180px -100px</Property>
+            </MenuItem>
+            <MenuItem>
+              <ClientEvent name="onClick">var dsUser=view.get(&quot;#dsUser&quot;);&#xD;
+var userId=dsUser.getData().first().get(&quot;username&quot;);&#xD;
+&#xD;
+var aaUpdateQuotaItemViewMapsDefaultView=view.get(&quot;#aaUpdateQuotaItemViewMapsDefaultView&quot;);&#xD;
+&#xD;
+aaUpdateQuotaItemViewMapsDefaultView.set(&quot;parameter&quot;,{userId:userId,isDefaultToView:false});&#xD;
+aaUpdateQuotaItemViewMapsDefaultView.execute({&#xD;
+	callback : function(success, obj){&#xD;
+		if (success) {&#xD;
+			var dgQuotaItemViewMap=view.get(&quot;#dgQuotaItemViewMap&quot;);&#xD;
+			var dsQuotaItemViewMap=view.get(&quot;#dsQuotaItemViewMap&quot;);&#xD;
+			&#xD;
+			dsQuotaItemViewMap.set(&quot;parameter&quot;,{userId:userId}).flushAsync();&#xD;
+			dgQuotaItemViewMap.refresh();&#xD;
+        }&#xD;
+		else{}}&#xD;
+});</ClientEvent>
+              <Property name="caption">设置当前筛选出的指标为不默认</Property>
+              <Property name="icon">url(>skin>common/icons.gif) -180px -100px</Property>
+            </MenuItem>
+          </Menu>
         </Container>
       </Children>
       <Tools/>
     </Dialog>
+    <DownloadAction id="aaDownLoadFile">
+      <Property name="fileProvider">downLoadFile#download</Property>
+      <Property name="parameter"></Property>
+      <Property name="inlineMode">browser</Property>
+    </DownloadAction>
+    <AjaxAction id="aaWriteExcel">
+      <Property name="service">writeExcel#writeExcel</Property>
+    </AjaxAction>
+    <Dialog id="dlgQuotaTypeTip">
+      <Property name="caption">指标说明</Property>
+      <Property name="width">700</Property>
+      <Property name="height">200</Property>
+      <Buttons/>
+      <Children>
+        <Container>
+          <TextArea id="taTip">
+            <Property name="editable">false</Property>
+            <Property name="readOnly">true</Property>
+          </TextArea>
+        </Container>
+      </Children>
+      <Tools/>
+    </Dialog>
+    <DownloadAction id="aaDownloadHelpFile">
+      <Property name="fileProvider">userHelpCenter#getHelpBook</Property>
+      <Property name="inlineMode">browser</Property>
+      <Property name="caption">下载该模块说明书</Property>
+    </DownloadAction>
   </View>
 </ViewConfig>

@@ -11,30 +11,44 @@
       </PropertyDef>
       <PropertyDef name="name">
         <Property name="dataType">String</Property>
+        <Property name="required">true</Property>
       </PropertyDef>
       <PropertyDef name="quotaProfession">
         <Property name="dataType">QuotaProfession</Property>
+        <Property name="required">true</Property>
       </PropertyDef>
       <PropertyDef name="quotaLevel">
         <Property name="dataType">QuotaLevel</Property>
+        <Property name="required">true</Property>
       </PropertyDef>
       <PropertyDef name="quotaDimension">
         <Property name="dataType">QuotaDimension</Property>
+        <Property name="required">true</Property>
       </PropertyDef>
       <PropertyDef name="quotaUnit">
         <Property name="dataType">QuotaUnit</Property>
+        <Property name="required">true</Property>
       </PropertyDef>
       <PropertyDef name="digit">
         <Property name="dataType">int</Property>
+        <Property name="required">true</Property>
       </PropertyDef>
       <PropertyDef name="rate">
         <Property name="dataType">String</Property>
+        <Property name="required">true</Property>
       </PropertyDef>
       <PropertyDef name="manageDept">
         <Property name="dataType">Department</Property>
+        <Property name="required">true</Property>
       </PropertyDef>
       <PropertyDef name="inUsed">
         <Property name="dataType">boolean</Property>
+      </PropertyDef>
+      <PropertyDef name="calculationFormulaInfo">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="quotaDefinitionInfo">
+        <Property name="dataType">String</Property>
       </PropertyDef>
     </DataType>
     <DataType name="QuotaProfession">
@@ -181,6 +195,20 @@ if(datas.current){&#xD;
         <Property name="caption">导出表单</Property>
         <Property name="action">epQuotaType</Property>
       </ToolBarButton>
+      <ToolBarButton>
+        <Property name="icon">url(>skin>common/icons.gif) -20px -200px</Property>
+        <Property name="caption">清除错误指标</Property>
+        <Property name="action">aaClearWrongQuotaType</Property>
+      </ToolBarButton>
+      <Fill/>
+      <ToolBarButton>
+        <ClientEvent name="onClick">var aaDownloadHelpFile=view.get(&quot;#aaDownloadHelpFile&quot;);&#xD;
+aaDownloadHelpFile.set(&quot;parameter&quot;,{helpname:&quot;QuotaTypeMaintain&quot;});&#xD;
+aaDownloadHelpFile.execute();</ClientEvent>
+        <Property name="caption">帮助</Property>
+        <Property name="icon">url(>skin>common/icons.gif) -180px -0px</Property>
+      </ToolBarButton>
+      <Separator/>
     </ToolBar>
     <DataGrid id="dgQuotaType">
       <Property name="dataSet">dsQuotaType</Property>
@@ -294,6 +322,20 @@ if(datas.current){&#xD;
         <Property name="align">center</Property>
         <Editor/>
       </DataColumn>
+      <DataColumn name="calculationFormulaInfo">
+        <Property name="property">calculationFormulaInfo</Property>
+        <Property name="wrappable">true</Property>
+        <Property name="align">left</Property>
+        <Property name="width">160</Property>
+        <Property name="caption">统计公式</Property>
+      </DataColumn>
+      <DataColumn name="quotaDefinitionInfo">
+        <Property name="property">quotaDefinitionInfo</Property>
+        <Property name="wrappable">true</Property>
+        <Property name="align">left</Property>
+        <Property name="width">160</Property>
+        <Property name="caption">指标定义</Property>
+      </DataColumn>
       <DataColumn name="inUsed">
         <Property name="property">inUsed</Property>
         <Property name="caption">在用</Property>
@@ -336,21 +378,21 @@ if(datas.current){&#xD;
         <Editor/>
       </DataColumn>
     </DataSetDropDown>
-    <DataSetDropDown id="dsddQuotaDimension">
-      <Property name="dataSet">dsQuotaDimension</Property>
-      <DataColumn>
-        <Property name="name">name</Property>
-        <Property name="property">name</Property>
-        <Property name="caption">指标维度</Property>
-        <Editor/>
-      </DataColumn>
-    </DataSetDropDown>
     <DataSetDropDown id="dsddDepartment">
       <Property name="dataSet">dsDepartment</Property>
       <DataColumn>
         <Property name="name">name</Property>
         <Property name="property">name</Property>
         <Property name="caption">指标管理部门</Property>
+        <Editor/>
+      </DataColumn>
+    </DataSetDropDown>
+    <DataSetDropDown id="dsddQuotaDimension">
+      <Property name="dataSet">dsQuotaDimension</Property>
+      <DataColumn>
+        <Property name="name">name</Property>
+        <Property name="property">name</Property>
+        <Property name="caption">指标维度</Property>
         <Editor/>
       </DataColumn>
     </DataSetDropDown>
@@ -365,7 +407,7 @@ if(datas.current){&#xD;
     <Dialog id="dlgQuotaType">
       <Property name="caption">指标种类编辑</Property>
       <Property name="width">800</Property>
-      <Property name="height">260</Property>
+      <Property name="height">285</Property>
       <Property name="closeable">false</Property>
       <Property name="closeAction">close</Property>
       <Buttons/>
@@ -385,7 +427,7 @@ dorado.MessageBox.confirm(&quot;您真的要保存吗?&quot;,function(){&#xD;
 			dgQuotaType.refresh();&#xD;
 			dlgQuotaType.hide();&#xD;
         }&#xD;
-		else{alert(&quot;执行失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 });&#xD;
 &#xD;
 });&#xD;
@@ -464,6 +506,22 @@ dorado.MessageBox.confirm(&quot;您真的要取消当前操作吗？&quot;,funct
             <Editor/>
           </AutoFormElement>
           <AutoFormElement>
+            <Property name="name">calculationFormulaInfo</Property>
+            <Property name="property">calculationFormulaInfo</Property>
+            <Property name="label">统计公式</Property>
+            <Editor>
+              <TextArea/>
+            </Editor>
+          </AutoFormElement>
+          <AutoFormElement>
+            <Property name="name">quotaDefinitionInfo</Property>
+            <Property name="property">quotaDefinitionInfo</Property>
+            <Property name="label">指标定义</Property>
+            <Editor>
+              <TextArea/>
+            </Editor>
+          </AutoFormElement>
+          <AutoFormElement>
             <Property name="name">inUsed</Property>
             <Property name="property">inUsed</Property>
             <Property name="label">是否在用</Property>
@@ -484,5 +542,13 @@ dorado.MessageBox.confirm(&quot;您真的要取消当前操作吗？&quot;,funct
       <Property name="extension">xlsx</Property>
       <Property name="maxSize">10000</Property>
     </Export2ReportAction>
+    <AjaxAction id="aaClearWrongQuotaType">
+      <Property name="service">quotaTypeDao#clearWrongQuotaTypes</Property>
+    </AjaxAction>
+    <DownloadAction id="aaDownloadHelpFile">
+      <Property name="fileProvider">userHelpCenter#getHelpBook</Property>
+      <Property name="inlineMode">browser</Property>
+      <Property name="caption">下载该模块说明书</Property>
+    </DownloadAction>
   </View>
 </ViewConfig>

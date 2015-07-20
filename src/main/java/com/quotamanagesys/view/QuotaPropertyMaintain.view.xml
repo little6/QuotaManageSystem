@@ -67,7 +67,7 @@ dorado.MessageBox.confirm(&quot;您真的要保存吗?&quot;,function(){&#xD;
 			dsQuotaProperty.flush();&#xD;
 			dgQuotaProperty.refresh();&#xD;
         }&#xD;
-		else{alert(&quot;执行失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 });&#xD;
 &#xD;
 });</ClientEvent>

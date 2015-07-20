@@ -2,11 +2,8 @@ package com.quotamanagesys.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -14,16 +11,13 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.transform.Transformers;
 import org.springframework.stereotype.Component;
 
-import com.bstek.bdf2.core.business.IDept;
-import com.bstek.bdf2.core.business.IUser;
-import com.bstek.bdf2.core.context.ContextHolder;
 import com.bstek.bdf2.core.model.DefaultUser;
 import com.bstek.bdf2.core.orm.hibernate.HibernateDao;
 import com.bstek.dorado.annotation.DataProvider;
 import com.bstek.dorado.annotation.DataResolver;
+import com.bstek.dorado.annotation.Expose;
 import com.bstek.dorado.data.entity.EntityState;
 import com.bstek.dorado.data.entity.EntityUtils;
 import com.bstek.dorado.data.provider.Criteria;
@@ -36,6 +30,7 @@ import com.quotamanagesys.model.QuotaItemViewMap;
 import com.quotamanagesys.model.QuotaLevel;
 import com.quotamanagesys.model.QuotaPropertyValue;
 import com.quotamanagesys.model.QuotaType;
+import com.quotamanagesys.model.QuotaTypeFormulaLink;
 import com.quotamanagesys.tools.CriteriaConvertCore;
 
 @Component
@@ -63,6 +58,8 @@ public class QuotaTypeDao extends HibernateDao {
 	ResultTableCreator resultTableCreator;
 	@Resource
 	CriteriaConvertCore criteriaConvertCore;
+	@Resource
+	QuotaTypeFormulaLinkDao quotaTypeFormulaLinkDao;
 	
 	@DataProvider
 	public Collection<QuotaType> getAll() {
@@ -228,6 +225,7 @@ public class QuotaTypeDao extends HibernateDao {
 				if (state.equals(EntityState.NEW)) {
 					session.save(quotaType);
 				} else if (state.equals(EntityState.MODIFIED)) {
+					boolean needToUpdate=false;
 					QuotaType fatherQuotaType=quotaType.getFatherQuotaType();
 					QuotaType oldQuotaType=getQuotaType(quotaType.getId());
 					QuotaType oldFatherQuotaType=oldQuotaType.getFatherQuotaType();
@@ -242,6 +240,7 @@ public class QuotaTypeDao extends HibernateDao {
 					
 					//指标种类名称变更
 					if (!quotaType.getName().equals(oldQuotaType.getName())) {
+						needToUpdate=true;
 						Collection<QuotaItemCreator> quotaItemCreators=quotaItemCreatorDao.getQuotaItemCreatorsByQuotaType(oldQuotaType.getId());
 						if (quotaItemCreators.size()>0) {
 							for (QuotaItemCreator quotaItemCreator : quotaItemCreators) {
@@ -265,7 +264,8 @@ public class QuotaTypeDao extends HibernateDao {
 					}
 					
 					//管理部门变更
-					if(!quotaType.getManageDept().equals(oldQuotaType.getManageDept())){
+					if(!quotaType.getManageDept().getId().equals(oldQuotaType.getManageDept().getId())){
+						needToUpdate=true;
 						Collection<QuotaItemCreator> quotaItemCreators=quotaItemCreatorDao.getQuotaItemCreatorsByQuotaType(oldQuotaType.getId());
 						if (quotaItemCreators.size()>0) {
 							QuotaCover topQuotaCover=quotaCoverDao.getTopQuotaCovers().get(0);
@@ -307,8 +307,10 @@ public class QuotaTypeDao extends HibernateDao {
 						}
 					}
 					
-					Collection<QuotaItem> quotaItems=quotaItemDao.getQuotaItemsByQuotaType(quotaType.getId());
-					resultTableCreator.createOrUpdateResultTable(quotaItems);
+					if (needToUpdate==true) {
+						Collection<QuotaItem> quotaItems=quotaItemDao.getQuotaItemsByQuotaType(quotaType.getId());
+						resultTableCreator.createOrUpdateResultTable(quotaItems);
+					}
 				} else if (state.equals(EntityState.DELETED)) {
 					//将下级指标种类的父级设置为null
 					Collection<QuotaType> childrenQuotaTypes=getChildrenQuotaTypes(quotaType.getId());
@@ -318,6 +320,9 @@ public class QuotaTypeDao extends HibernateDao {
 						session.flush();
 						session.clear();
 					}
+					
+					//级联删除QuotaTypeFormulaLink
+					quotaTypeFormulaLinkDao.clearQuotaTypeFormulaLink(quotaType);
 					
 					//级联删除QuotaItemCreator
 					Collection<QuotaItemCreator> quotaItemCreators=quotaItemCreatorDao.getQuotaItemCreatorsByQuotaType(quotaType.getId());
@@ -349,6 +354,7 @@ public class QuotaTypeDao extends HibernateDao {
 	@DataResolver
 	public void deleteQuotaTypes(Collection<QuotaType> quotaTypes) {
 		Session session = this.getSessionFactory().openSession();
+		quotaTypeFormulaLinkDao.clearQuotaTypesFormulaLink(quotaTypes);
 		try {
 			for (QuotaType quotaType : quotaTypes) {
 				//将下级指标种类的父级设置为null
@@ -362,12 +368,16 @@ public class QuotaTypeDao extends HibernateDao {
 				
 				//级联删除QuotaItemCreator
 				Collection<QuotaItemCreator> quotaItemCreators=quotaItemCreatorDao.getQuotaItemCreatorsByQuotaType(quotaType.getId());
-				quotaItemCreatorDao.deleteQuotaItemCreators(quotaItemCreators);
+				if (quotaItemCreators.size()>0) {
+					quotaItemCreatorDao.deleteQuotaItemCreators(quotaItemCreators);
+				}	
 				
 				//级联删除QuotaPropertyValue
 				Collection<QuotaPropertyValue> quotaPropertyValues=quotaPropertyValueDao.getQuotaPropertyValuesByQuotaProperty(quotaType.getId());
-				quotaPropertyValueDao.deleteQuotaPropertyValues(quotaPropertyValues);
-
+				if (quotaPropertyValues.size()>0) {
+					quotaPropertyValueDao.deleteQuotaPropertyValues(quotaPropertyValues);
+				}
+				
 				quotaType.setFatherQuotaType(null);
 				quotaType.setManageDept(null);
 				quotaType.setQuotaDimension(null);
@@ -383,6 +393,22 @@ public class QuotaTypeDao extends HibernateDao {
 		}finally{
 			session.flush();
 			session.close();
+		}
+	}
+	
+	@Expose
+	public void clearWrongQuotaTypes(){
+		String hqlString="from "+QuotaType.class.getName()+" where "
+				+"quotaProfession.id=null "
+				+"or quotaLevel.id=null "
+				+"or quotaDimension.id=null "
+				+"or quotaUnit.id=null "
+				+"or manageDept.id=null "
+				+"or rate=null ";
+		Collection<QuotaType> wrongQuotaTypes=this.query(hqlString);
+		if (wrongQuotaTypes.size()>0) {
+			System.out.println("wrong quotaTypes size is :"+wrongQuotaTypes.size());
+			deleteQuotaTypes(wrongQuotaTypes);
 		}
 	}
 	

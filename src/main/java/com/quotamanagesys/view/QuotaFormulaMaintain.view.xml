@@ -91,7 +91,7 @@ uaQuotaFormula.set(&quot;parameter&quot;,{quotaFormulaResultId:quotaFormulaResul
 			dsQuotaFormula.flush();&#xD;
 			dgQuotaFormula.refresh();&#xD;
         }&#xD;
-		else{alert(&quot;执行失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 });</ClientEvent>
               <Property name="caption">保存</Property>
               <Property name="icon">url(>skin>common/icons.gif) -140px -20px</Property>

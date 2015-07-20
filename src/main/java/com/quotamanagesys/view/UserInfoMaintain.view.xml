@@ -307,7 +307,7 @@ ipUserInfo.execute(&#xD;
 				}&#xD;
 			});&#xD;
         }&#xD;
-		else{alert(&quot;导入数据失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 }&#xD;
 );</ClientEvent>
                 <Property name="caption">导入用户</Property>
@@ -476,7 +476,7 @@ updateActionUser.execute({&#xD;
 			var dataSetUser=view.get(&quot;#dataSetUser&quot;);&#xD;
 			dataSetUser.set(&quot;parameter&quot;,{deptId:deptId}).flushAsync();&#xD;
         }&#xD;
-		else{alert(&quot;发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 });</ClientEvent>
                 <Property name="caption">保存</Property>
                 <Property name="icon"> url(>skin>common/icons.gif) -140px -20px</Property>
@@ -596,7 +596,7 @@ aaSaveUserPositions.execute({&#xD;
 			dataSetUser.set(&quot;parameter&quot;,{deptId:deptId}).flushAsync();&#xD;
 			view.id(&quot;dlgPosition&quot;).hide();&#xD;
         }&#xD;
-		else{alert(&quot;关联岗位失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 });</ClientEvent>
                   <Property name="caption">确定</Property>
                   <Property name="icon">url(>skin>common/icons.gif) -20px -0px</Property>
@@ -674,7 +674,7 @@ aaChangeDept.execute({&#xD;
 			dataSetUser.set(&quot;parameter&quot;,{deptId:deptId}).flushAsync();&#xD;
 			view.id(&quot;dlgDeptForChange&quot;).hide();&#xD;
         }&#xD;
-		else{alert(&quot;变更部门失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 });</ClientEvent>
                   <Property name="caption">确定</Property>
                   <Property name="icon">url(>skin>common/icons.gif) -20px -0px</Property>

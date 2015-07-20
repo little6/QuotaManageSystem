@@ -51,6 +51,9 @@ public class ShowColumn implements Serializable{
 	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name="SHOW_COLUMN_TRIGGER_ID")
 	private ShowColumnTrigger showColumnTrigger;
+	@Column(name="FILTER_MAP_COLUMN_NAME")
+	private String filterMapColumnName;
+	
 	public String getId() {
 		return id;
 	}
@@ -123,6 +126,12 @@ public class ShowColumn implements Serializable{
 	public void setQuotaItemViewTableManage(
 			QuotaItemViewTableManage quotaItemViewTableManage) {
 		this.quotaItemViewTableManage = quotaItemViewTableManage;
+	}
+	public String getFilterMapColumnName() {
+		return filterMapColumnName;
+	}
+	public void setFilterMapColumnName(String filterMapColumnName) {
+		this.filterMapColumnName = filterMapColumnName;
 	}
 	
 }

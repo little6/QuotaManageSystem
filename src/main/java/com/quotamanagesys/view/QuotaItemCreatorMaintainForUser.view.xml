@@ -62,6 +62,12 @@
       <PropertyDef name="inUsed">
         <Property name="dataType">boolean</Property>
       </PropertyDef>
+      <PropertyDef name="calculationFormulaInfo">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="quotaDefinitionInfo">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
     </DataType>
     <DataType name="QuotaProfession">
       <Property name="creationType">com.quotamanagesys.model.QuotaProfession</Property>
@@ -478,6 +484,15 @@ ipYearTargetValue.execute(&#xD;
                   <Property name="icon">url(>skin>common/icons.gif) -120px -240px</Property>
                 </MenuItem>
               </MenuButton>
+              <Fill/>
+              <ToolBarButton>
+                <ClientEvent name="onClick">var aaDownloadHelpFile=view.get(&quot;#aaDownloadHelpFile&quot;);&#xD;
+aaDownloadHelpFile.set(&quot;parameter&quot;,{helpname:&quot;QuotaItemCreatorMaintainForUser&quot;});&#xD;
+aaDownloadHelpFile.execute();</ClientEvent>
+                <Property name="caption">帮助</Property>
+                <Property name="icon">url(>skin>common/icons.gif) -180px -0px</Property>
+              </ToolBarButton>
+              <Separator/>
             </ToolBar>
             <DataGrid id="dgQuotaItemCreator">
               <ClientEvent name="onClick">var dsQuotaPropertyValue=view.get(&quot;#dsQuotaPropertyValue&quot;);&#xD;
@@ -1001,7 +1016,7 @@ dorado.MessageBox.confirm(&quot;您真的要保存吗?&quot;,function(){&#xD;
 			dgSplitQuotaItemCreator.refresh();&#xD;
 			dlgQuotaItemCreator.hide();&#xD;
         }&#xD;
-		else{alert(&quot;执行失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 	});&#xD;
 });</ClientEvent>
                                 <Property name="caption">确定</Property>
@@ -1188,7 +1203,7 @@ dorado.MessageBox.confirm(&quot;您真的要保存吗?&quot;,function(){&#xD;
 		if (success) {&#xD;
 			dgQuotaPropertyValue2.refresh();&#xD;
         }&#xD;
-		else{alert(&quot;执行失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 });&#xD;
 &#xD;
 });</ClientEvent>
@@ -1684,7 +1699,7 @@ dorado.MessageBox.confirm(&quot;您真的要保存吗?&quot;,function(){&#xD;
 		if (success) {&#xD;
 			dgQuotaPropertyValue3.refresh();&#xD;
         }&#xD;
-		else{alert(&quot;执行失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 });&#xD;
 &#xD;
 });</ClientEvent>
@@ -1897,7 +1912,7 @@ aaCopyQuotaPropertiesToChildren.set(&quot;parameter&quot;,{quotaItemCreatorId:qu
 		if (success) {&#xD;
 			&#xD;
         }&#xD;
-		else{alert(&quot;失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 }&#xD;
 );</ClientEvent>
                 <Property name="caption">将属性复制到下级指标</Property>
@@ -1940,7 +1955,7 @@ dorado.MessageBox.confirm(&quot;您真的要保存吗?&quot;,function(){&#xD;
 			dgQuotaItemCreator.refresh();&#xD;
 			dlgThisQuotaItemCreator.hide();&#xD;
         }&#xD;
-		else{alert(&quot;执行失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 	});&#xD;
 });</ClientEvent>
                     <Property name="caption">确定</Property>
@@ -2018,6 +2033,11 @@ if(quotaCoverId){&#xD;
               </Children>
               <Tools/>
             </Dialog>
+            <DownloadAction id="aaDownloadHelpFile">
+              <Property name="fileProvider">userHelpCenter#getHelpBook</Property>
+              <Property name="inlineMode">browser</Property>
+              <Property name="caption">下载该模块说明书</Property>
+            </DownloadAction>
           </Container>
         </MainControl>
         <SideControl>
@@ -2079,7 +2099,7 @@ dorado.MessageBox.confirm(&quot;您真的要保存吗?&quot;,function(){&#xD;
 		if (success) {&#xD;
 			dgQuotaPropertyValue.refresh();&#xD;
         }&#xD;
-		else{alert(&quot;执行失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 });&#xD;
 &#xD;
 });</ClientEvent>

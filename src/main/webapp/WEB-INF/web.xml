@@ -17,6 +17,10 @@
 	  <filter-name>springSecurityFilterChain</filter-name>
 	  <url-pattern>/*</url-pattern>
 	</filter-mapping>
+	<context-param>
+	    <param-name>contextConfigLocation</param-name>
+	    <param-value>classpath:ureport-configs.xml</param-value>
+	</context-param>
 	<servlet>
 		<servlet-name>doradoServlet</servlet-name>
 		<servlet-class>com.bstek.dorado.web.servlet.DoradoServlet</servlet-class>
@@ -33,5 +37,13 @@
 	<servlet-mapping>
 		<servlet-name>doradoServlet</servlet-name>
 		<url-pattern>/dorado/*</url-pattern>
+	</servlet-mapping>
+	<servlet>
+	    <servlet-name>ureportServlet</servlet-name>
+	    <servlet-class>com.bstek.ureport.servlet.UReportServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+	    <servlet-name>ureportServlet</servlet-name>
+	    <url-pattern>/ureport</url-pattern>
 	</servlet-mapping>
 </web-app>

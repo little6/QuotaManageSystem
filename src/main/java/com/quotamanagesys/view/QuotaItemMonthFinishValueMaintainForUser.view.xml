@@ -178,7 +178,7 @@ uaQuotaItem.execute({&#xD;
 				dlgQuotaItemNotAllowSubmit.show();&#xD;
 			}&#xD;
 		} else {&#xD;
-			alert(&quot;发生异常：&quot; + obj);&#xD;
+			
 		}&#xD;
 	}&#xD;
 });</ClientEvent>
@@ -228,6 +228,15 @@ ipQuotaItemInputValue.execute({&#xD;
             <Property name="icon">url(>skin>common/icons.gif) -120px -240px</Property>
           </MenuItem>
         </MenuButton>
+        <Fill/>
+        <ToolBarButton>
+          <ClientEvent name="onClick">var aaDownloadHelpFile=view.get(&quot;#aaDownloadHelpFile&quot;);&#xD;
+aaDownloadHelpFile.set(&quot;parameter&quot;,{helpname:&quot;QuotaItemMonthFinishValueMaintainForUser&quot;});&#xD;
+aaDownloadHelpFile.execute();</ClientEvent>
+          <Property name="caption">帮助</Property>
+          <Property name="icon">url(>skin>common/icons.gif) -180px -0px</Property>
+        </ToolBarButton>
+        <Separator/>
       </ToolBar>
       <DataGrid id="dgQuotaItem">
         <ClientEvent name="onRenderRow">var targetValue1=arg.data.get(&quot;finishValue&quot;);&#xD;
@@ -580,6 +589,15 @@ ipQuotaItemInputValue.execute({&#xD;
                       <Property name="icon">url(>skin>common/icons.gif) -120px -240px</Property>
                     </MenuItem>
                   </MenuButton>
+                  <Fill/>
+                  <ToolBarButton>
+                    <ClientEvent name="onClick">var aaDownloadHelpFile=view.get(&quot;#aaDownloadHelpFile&quot;);&#xD;
+aaDownloadHelpFile.set(&quot;parameter&quot;,{helpname:&quot;QuotaItemMonthFinishValueMaintainForUser&quot;});&#xD;
+aaDownloadHelpFile.execute();</ClientEvent>
+                    <Property name="caption">帮助</Property>
+                    <Property name="icon">url(>skin>common/icons.gif) -180px -0px</Property>
+                  </ToolBarButton>
+                  <Separator/>
                 </ToolBar>
                 <DataGrid id="dgQuotaItemNotAllowSubmit">
                   <ClientEvent name="onClick">var dsQuotaFormulaResultValueOfLightType=view.get(&quot;#dsQuotaFormulaResultValueOfLightType&quot;);&#xD;
@@ -922,6 +940,11 @@ style:&quot;margin:2px&quot;&#xD;
         </Children>
         <Tools/>
       </Dialog>
+      <DownloadAction id="aaDownloadHelpFile">
+        <Property name="fileProvider">userHelpCenter#getHelpBook</Property>
+        <Property name="inlineMode">browser</Property>
+        <Property name="caption">下载该模块说明书</Property>
+      </DownloadAction>
     </Container>
   </View>
 </ViewConfig>

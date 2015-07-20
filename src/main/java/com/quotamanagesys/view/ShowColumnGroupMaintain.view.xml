@@ -109,7 +109,7 @@ dorado.MessageBox.confirm(&quot;您真的要保存吗?&quot;,function(){&#xD;
 			dsShowColumnGroup.flush();&#xD;
 			dgShowColumnGroup.refresh();&#xD;
         }&#xD;
-		else{alert(&quot;执行失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 });&#xD;
 &#xD;
 });</ClientEvent>
@@ -189,7 +189,7 @@ aaCopyShowColumnGroup.execute({&#xD;
 			dsShowColumnGroup.set(&quot;parameter&quot;,{quotaItemViewTableManageId:toId}).flushAsync();&#xD;
 			view.get(&quot;#dlgQuotaItemViewTableManage&quot;).hide();&#xD;
         }&#xD;
-		else{alert(&quot; 复制列分组失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 });&#xD;
 &#xD;
 </ClientEvent>

@@ -45,23 +45,6 @@
     </DataType>
   </Model>
   <View>
-    <DataSet id="dsQuotaCover">
-      <Property name="dataProvider">quotaCoverDao#getAll</Property>
-      <Property name="dataType">[QuotaCover]</Property>
-    </DataSet>
-    <DataSet id="dsFatherQuotaCover">
-      <Property name="dataProvider">quotaCoverDao#getAll</Property>
-      <Property name="dataType">[QuotaCover]</Property>
-    </DataSet>
-    <DataSet id="dsDutyDept">
-      <Property name="dataType">[Department]</Property>
-      <Property name="dataProvider">departmentDao#getAll</Property>
-    </DataSet>
-    <DataSet id="dsDutyDeptLinked">
-      <Property name="dataType">[Department]</Property>
-      <Property name="dataProvider">departmentDao#getDutyDeptsByQuotaCover</Property>
-      <Property name="parameter"></Property>
-    </DataSet>
     <SplitPanel>
       <Property name="position">70%</Property>
       <MainControl>
@@ -115,7 +98,7 @@ uaDutyDeptLinked.execute({&#xD;
 			dsDutyDeptLinked.set(&quot;parameter&quot;,{quotaCoverId:quotaCoverId}).flushAsync();&#xD;
 			dgDutyDeptLinked.refresh();&#xD;
 		}else{&#xD;
-			alert(&quot;执行失败！发生异常：&quot; + obj)&#xD;
+			
 		}&#xD;
 	}&#xD;
 })&#xD;
@@ -316,7 +299,7 @@ dorado.MessageBox.confirm(&quot;您真的要保存吗?&quot;,function(){&#xD;
 			dgDutyDeptLinked.refresh();&#xD;
 			dgQuotaCover.refresh();&#xD;
         }&#xD;
-		else{alert(&quot;执行失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 });&#xD;
 &#xD;
 });</ClientEvent>
@@ -391,5 +374,22 @@ dgDutyDeptLinked.refresh();</ClientEvent>
         </TabControl>
       </SideControl>
     </SplitPanel>
+    <DataSet id="dsQuotaCover">
+      <Property name="dataProvider">quotaCoverDao#getAll</Property>
+      <Property name="dataType">[QuotaCover]</Property>
+    </DataSet>
+    <DataSet id="dsFatherQuotaCover">
+      <Property name="dataProvider">quotaCoverDao#getAll</Property>
+      <Property name="dataType">[QuotaCover]</Property>
+    </DataSet>
+    <DataSet id="dsDutyDept">
+      <Property name="dataType">[Department]</Property>
+      <Property name="dataProvider">departmentDao#getAll</Property>
+    </DataSet>
+    <DataSet id="dsDutyDeptLinked">
+      <Property name="dataType">[Department]</Property>
+      <Property name="dataProvider">departmentDao#getDutyDeptsByQuotaCover</Property>
+      <Property name="parameter"></Property>
+    </DataSet>
   </View>
 </ViewConfig>

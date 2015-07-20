@@ -38,7 +38,12 @@ public class QuotaItemViewMapDao extends HibernateDao {
 	@Resource
 	UserDao userDao;
 	@Resource
+	QuotaCoverDao quotaCoverDao;
+	@Resource
 	CriteriaConvertCore criteriaConvertCore;
+	
+	Criteria tempCriteria;
+	Criteria tempCriteria2;
 	
 	@DataProvider
 	public Collection<QuotaItemViewMap> getAll(){
@@ -57,7 +62,26 @@ public class QuotaItemViewMapDao extends HibernateDao {
 	}
 	
 	@DataProvider
+	public Collection<QuotaItemViewMap> getQuotaItemViewMapsByUserWithCriteria(Criteria criteria,String userId) throws Exception{
+		if (userId!=null) {
+			String filterString=criteriaConvertCore.convertToSQLString(criteria);
+			if (!filterString.equals("")) {
+				filterString=" and ("+filterString+")";
+			}
+			
+			String hqlString="from "+QuotaItemViewMap.class.getName()+" where user.username='"+userId+"'"+filterString;
+			Collection<QuotaItemViewMap> quotaItemViewMaps=this.query(hqlString);
+			return quotaItemViewMaps;
+		} else {
+			System.out.print("参数为空");
+			return null;
+		}
+	}
+	
+	@DataProvider
 	public void getQuotaItemViewMapsByUserWithPage(Page<QuotaItem> page,Criteria criteria,String userId) throws Exception{
+		tempCriteria=null;
+		tempCriteria=criteria;
 		if (userId!=null) {
 			String filterString=criteriaConvertCore.convertToSQLString(criteria);
 			if (!filterString.equals("")) {
@@ -140,6 +164,8 @@ public class QuotaItemViewMapDao extends HibernateDao {
 	
 	@DataProvider
 	public void getQuotaItemCreatorsNotYetMapByUserWithPage(Page<QuotaItemCreator> page,Criteria criteria,String userId){
+		tempCriteria2=null;
+		tempCriteria2=criteria;
 		if (page!=null) {
 			ArrayList<QuotaItemCreator> results=new ArrayList<QuotaItemCreator>();
 					
@@ -186,6 +212,28 @@ public class QuotaItemViewMapDao extends HibernateDao {
 		}else {
 			System.out.print("page为空");
 		}
+	}
+	
+	@DataProvider
+	public Collection<QuotaItemCreator> getQuotaItemCreatorsNotYetMapByUserWithCriteria(Criteria criteria,String userId){	
+		Collection<QuotaItemCreator> quotaItemCreators=quotaItemCreatorDao.getQuotaItemCreatorsByCriteria(criteria);
+		Collection<QuotaItemViewMap> quotaItemViewMaps=getQuotaItemViewMapsByUser(userId);
+		
+		for (QuotaItemViewMap quotaItemViewMap : quotaItemViewMaps) {
+			String quotaTypeId=quotaItemViewMap.getQuotaType().getId();
+			String quotaCoverId=quotaItemViewMap.getQuotaCover().getId();
+			QuotaItemCreator quotaItemCreator=quotaItemCreatorDao.getQuotaItemCreatorByQuotaTypeAndCover(quotaTypeId, quotaCoverId);
+			if (quotaItemCreator!=null) {
+				for (QuotaItemCreator quotaItemCreator2 : quotaItemCreators) {
+					if (quotaItemCreator2.getId().equals(quotaItemCreator.getId())) {
+						quotaItemCreators.remove(quotaItemCreator2);
+						break;
+					}
+				}
+			}
+		}
+		
+		return quotaItemCreators;
 	}
 	
 	@Expose
@@ -261,6 +309,71 @@ public class QuotaItemViewMapDao extends HibernateDao {
 	}
 	
 	@Expose
+	public void initQuotaItemViewMapsByAllWithAll(){
+		Collection<DefaultDept> depts=departmentDao.getAll();
+		for (DefaultDept dept : depts) {
+			initQuotaItemViewMapsByDept(dept.getId());
+		}
+	}
+	
+	@Expose
+	public void initQuotaItemViewMapsByDeptWithAll(String deptId){
+		Session session = this.getSessionFactory().openSession();
+		Collection<DefaultUser> users=userDao.getUsersByDept(deptId);
+		
+		try {
+			for (DefaultUser user : users) {
+				initQuotaItemViewMapsByUserWithAll(user.getUsername());
+			}
+		} catch (Exception e) {
+			System.out.print(e.toString());
+		}finally{
+			session.flush();
+			session.close();
+		}
+	}
+	
+	@Expose
+	public void initQuotaItemViewMapsByUserWithAll(String userId){
+		Session session = this.getSessionFactory().openSession();
+		DefaultUser user=userDao.getUser(userId);
+		
+		if (user!=null) {	
+			Collection<QuotaItemViewMap> quotaItemViewMaps=getQuotaItemViewMapsByUser(user.getUsername());
+			if (quotaItemViewMaps.size()>0) {
+				delete(quotaItemViewMaps);
+			}
+			
+			try {
+				List<QuotaItemCreator> quotaItemCreators=(List<QuotaItemCreator>) quotaItemCreatorDao.getAll();
+				
+				int size=quotaItemCreators.size();
+				int index=0;
+				
+				while (index<=size-1) {
+					QuotaItemCreator quotaItemCreator=quotaItemCreators.get(index);
+					QuotaItemViewMap quotaItemViewMap=new QuotaItemViewMap();
+					quotaItemViewMap.setUser(user);
+					quotaItemViewMap.setQuotaType(quotaItemCreator.getQuotaType());
+					quotaItemViewMap.setQuotaCover(quotaItemCreator.getQuotaCover());
+					quotaItemViewMap.setCanView(true);
+					quotaItemViewMap.setDefaultView(true);
+					session.merge(quotaItemViewMap);
+					session.flush();
+					index++;
+				}
+			} catch (Exception e) {
+				System.out.print(e.toString());
+			}finally{
+				session.flush();
+				session.close();
+			}
+		}else {
+			System.out.print("用户为空，无法初始化指标可视关系");
+		}
+	}
+	
+	@Expose
 	public void initQuotaItemViewMapsByQuotaItemCreator(String quotaItemCreatorId,boolean isDutyDeptChanged,boolean isCoverChanged){
 		Session session = this.getSessionFactory().openSession();
 		QuotaItemCreator quotaItemCreator=quotaItemCreatorDao.getQuotaItemCreator(quotaItemCreatorId);
@@ -318,6 +431,80 @@ public class QuotaItemViewMapDao extends HibernateDao {
 		}
 	}
 	
+	@Expose
+	public void updateQuotaItemViewMapsCanView(String userId,boolean isCanView){
+		Session session=this.getSessionFactory().openSession();
+		try {
+		    Collection<QuotaItemViewMap> quotaItemViewMaps=getQuotaItemViewMapsByUserWithCriteria(tempCriteria, userId);
+			for (QuotaItemViewMap quotaItemViewMap : quotaItemViewMaps) {
+				if (isCanView==false) {
+					QuotaItemViewMap thisQuotaItemViewMap=getQuotaItemViewMap(quotaItemViewMap.getId());
+					thisQuotaItemViewMap.setUser(null);
+					thisQuotaItemViewMap.setQuotaType(null);
+					thisQuotaItemViewMap.setQuotaCover(null);
+					session.delete(thisQuotaItemViewMap);
+					session.flush();
+					session.clear();
+				}
+			}
+		} catch (Exception e) {
+			System.out.print(e.toString());
+		}finally{
+			session.flush();
+			session.close();
+		}
+	}
+	
+	@Expose
+	public void updateQuotaItemViewMapsDefaultView(String userId,boolean isDefaultToView){
+		Session session=this.getSessionFactory().openSession();
+		try {
+		    Collection<QuotaItemViewMap> quotaItemViewMaps=getQuotaItemViewMapsByUserWithCriteria(tempCriteria, userId);
+			for (QuotaItemViewMap quotaItemViewMap : quotaItemViewMaps) {
+				QuotaItemViewMap thisQuotaItemViewMap=getQuotaItemViewMap(quotaItemViewMap.getId());
+				
+				boolean canView=quotaItemViewMap.isCanView();
+				if (canView==true) {
+					thisQuotaItemViewMap.setDefaultView(isDefaultToView);
+				}
+				
+				session.merge(thisQuotaItemViewMap);
+				session.flush();
+				session.clear();
+			}
+		} catch (Exception e) {
+			System.out.print(e.toString());
+		}finally{
+			session.flush();
+			session.close();
+		}
+	}
+	
+	@Expose
+	public void addQuotaItemViewMapsCanView(String userId){
+		Session session=this.getSessionFactory().openSession();
+		Collection<QuotaItemCreator> quotaItemCreators=getQuotaItemCreatorsNotYetMapByUserWithCriteria(tempCriteria2, userId);
+		DefaultUser user=userDao.getUser(userId);
+		
+		try {
+			for (QuotaItemCreator quotaItemCreator : quotaItemCreators) {
+				QuotaItemViewMap quotaItemViewMap=new QuotaItemViewMap();
+				quotaItemViewMap.setUser(user);
+				quotaItemViewMap.setQuotaType(quotaItemCreator.getQuotaType());
+				quotaItemViewMap.setQuotaCover(quotaItemCreator.getQuotaCover());
+				quotaItemViewMap.setCanView(true);
+				quotaItemViewMap.setDefaultView(false);
+				session.save(quotaItemViewMap);
+				session.flush();
+			}
+		} catch (Exception e) {
+			System.out.print(e.toString());
+		}finally{
+			session.flush();
+			session.close();
+		}
+	}
+	
 	@DataResolver
 	public void saveQuotaItemViewMaps(Collection<QuotaItemViewMap> quotaItemViewMaps){
 		Collection<QuotaItemViewMap> adds=new ArrayList<QuotaItemViewMap>();
@@ -350,7 +537,10 @@ public class QuotaItemViewMapDao extends HibernateDao {
 		Session session=this.getSessionFactory().openSession();
 		try {
 			for (QuotaItemViewMap quotaItemViewMap : quotaItemViewMaps) {
-				session.save(quotaItemViewMap);
+				quotaItemViewMap.setQuotaCover(quotaCoverDao.getQuotaCover(quotaItemViewMap.getQuotaCover().getId()));
+				quotaItemViewMap.setQuotaType(quotaTypeDao.getQuotaType(quotaItemViewMap.getQuotaType().getId()));
+				quotaItemViewMap.setUser(userDao.getUser(quotaItemViewMap.getUser().getUsername()));
+				session.merge(quotaItemViewMap);
 				session.flush();
 				session.clear();
 			}
@@ -370,20 +560,20 @@ public class QuotaItemViewMapDao extends HibernateDao {
 				QuotaItemViewMap thisQuotaItemViewMap=getQuotaItemViewMap(quotaItemViewMap.getId());
 				
 				boolean canView=quotaItemViewMap.isCanView();
-				thisQuotaItemViewMap.setCanView(canView);
 				if (canView==false) {
-					boolean defaultView=false;
+					thisQuotaItemViewMap.setUser(null);
+					thisQuotaItemViewMap.setQuotaType(null);
+					thisQuotaItemViewMap.setQuotaCover(null);
+					session.delete(thisQuotaItemViewMap);
+					session.flush();
+					session.clear();
+				}else if (canView==true) {
+					boolean defaultView=quotaItemViewMap.isDefaultView();
 					thisQuotaItemViewMap.setDefaultView(defaultView);
-				}
-				
-				boolean defaultView=quotaItemViewMap.isDefaultView();
-				if (canView==true) {
-					thisQuotaItemViewMap.setDefaultView(defaultView);
-				}
-				
-				session.merge(thisQuotaItemViewMap);
-				session.flush();
-				session.clear();
+					session.merge(thisQuotaItemViewMap);
+					session.flush();
+					session.clear();
+				}	
 			}
 		} catch (Exception e) {
 			System.out.print(e.toString());

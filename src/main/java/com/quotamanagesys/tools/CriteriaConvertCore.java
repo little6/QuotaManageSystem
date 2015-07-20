@@ -32,22 +32,22 @@ public class CriteriaConvertCore {
 						if (datatypeString.equals("int")||datatypeString.equals("boolean")||datatypeString.equals("double")
 								||datatypeString.equals("float")) {
 							if (orFilterString.equals("")) {
-								orFilterString="("+propertyString+" "+oparateString+" "+valueString+")";
+								orFilterString="( "+propertyString+" "+oparateString+" "+valueString+")";
 							} else {
-								orFilterString=orFilterString+" or ("+propertyString+" "+oparateString+" "+valueString+")";
+								orFilterString=orFilterString+" or ( "+propertyString+" "+oparateString+" "+valueString+")";
 							}
 						}else {
 							if (orFilterString.equals("")) {
 								if (oparateString.equals("like")||oparateString.equals("not like")) {
-									orFilterString="("+propertyString+" "+oparateString+" '%"+valueString+"%')";
+									orFilterString="( "+propertyString+" "+oparateString+" '%"+valueString+"%')";
 								}else {
-									orFilterString="("+propertyString+" "+oparateString+" '"+valueString+"')";
+									orFilterString="( "+propertyString+" "+oparateString+" '"+valueString+"')";
 								}
 							} else {
 								if (oparateString.equals("like")||oparateString.equals("not like")) {
-									orFilterString=orFilterString+" or ("+propertyString+" "+oparateString+" '%"+valueString+"%')";
+									orFilterString=orFilterString+" or ( "+propertyString+" "+oparateString+" '%"+valueString+"%')";
 								}else {
-									orFilterString=orFilterString+" or ("+propertyString+" "+oparateString+" '"+valueString+"')";
+									orFilterString=orFilterString+" or ( "+propertyString+" "+oparateString+" '"+valueString+"')";
 								}
 							}
 						}
@@ -68,22 +68,22 @@ public class CriteriaConvertCore {
 					if (datatypeString.equals("int")||datatypeString.equals("boolean")||datatypeString.equals("double")
 							||datatypeString.equals("float")) {
 						if (filterString.equals("")) {
-							filterString="("+propertyString+" "+oparateString+" "+valueString+")";
+							filterString="( "+propertyString+" "+oparateString+" "+valueString+")";
 						} else {
-							filterString=filterString+" and ("+propertyString+" "+oparateString+" "+valueString+")";
+							filterString=filterString+" and ( "+propertyString+" "+oparateString+" "+valueString+")";
 						}	
 					}else {
 						if (filterString.equals("")) {
 							if (oparateString.equals("like")||oparateString.equals("not like")) {
-								filterString="("+propertyString+" "+oparateString+" '%"+valueString+"%')";
+								filterString="( "+propertyString+" "+oparateString+" '%"+valueString+"%')";
 							}else {
-								filterString="("+propertyString+" "+oparateString+" '"+valueString+"')";
+								filterString="( "+propertyString+" "+oparateString+" '"+valueString+"')";
 							}
 						} else {
 							if (oparateString.equals("like")||oparateString.equals("not like")) {
-								filterString=filterString+" and ("+propertyString+" "+oparateString+" '%"+valueString+"%')";
+								filterString=filterString+" and ( "+propertyString+" "+oparateString+" '%"+valueString+"%')";
 							}else {
-								filterString=filterString+" and ("+propertyString+" "+oparateString+" '"+valueString+"')";
+								filterString=filterString+" and ( "+propertyString+" "+oparateString+" '"+valueString+"')";
 							}
 						}	
 					}

@@ -161,6 +161,15 @@ ipMonthTargetValue.execute(&#xD;
                   <Property name="icon">url(>skin>common/icons.gif) -120px -240px</Property>
                 </MenuItem>
               </MenuButton>
+              <Fill/>
+              <ToolBarButton>
+                <ClientEvent name="onClick">var aaDownloadHelpFile=view.get(&quot;#aaDownloadHelpFile&quot;);&#xD;
+aaDownloadHelpFile.set(&quot;parameter&quot;,{helpname:&quot;QuotaItemTargetValueMaintainForUser&quot;});&#xD;
+aaDownloadHelpFile.execute();</ClientEvent>
+                <Property name="caption">帮助</Property>
+                <Property name="icon">url(>skin>common/icons.gif) -180px -0px</Property>
+              </ToolBarButton>
+              <Separator/>
             </ToolBar>
             <DataGrid id="dgQuotaItem">
               <ClientEvent name="onClick">var dsQuotaTargetValue=view.get(&quot;#dsQuotaTargetValue&quot;);&#xD;
@@ -417,6 +426,11 @@ epQuotaTargetValue.execute({&#xD;
               <Property name="successMessage">更新成功！</Property>
               <Property name="service">quotaItemInfoImportCore#updateMonthTargetValue</Property>
             </AjaxAction>
+            <DownloadAction id="aaDownloadHelpFile">
+              <Property name="fileProvider">userHelpCenter#getHelpBook</Property>
+              <Property name="inlineMode">browser</Property>
+              <Property name="caption">下载该模块说明书</Property>
+            </DownloadAction>
           </Container>
         </MainControl>
         <SideControl>

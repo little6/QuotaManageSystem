@@ -148,6 +148,7 @@ public class ShowColumnDao extends HibernateDao {
 								thisShowColumn.setVisible(copyColumn.getVisible());
 								thisShowColumn.setWidth(copyColumn.getWidth());
 								thisShowColumn.setWrappable(copyColumn.getWrappable());
+								thisShowColumn.setFilterMapColumnName(copyColumn.getFilterMapColumnName());
 								session.merge(thisShowColumn);
 								session.flush();
 								session.clear();
@@ -203,6 +204,7 @@ public class ShowColumnDao extends HibernateDao {
 					showColumn.setAlign("left");
 					showColumn.setSort(i);
 					showColumn.setQuotaItemViewTableManage(quotaItemViewTableManage);
+					showColumn.setFilterMapColumnName(rsm.getColumnName(i));
 					session.merge(showColumn);
 				}
 				conn.close();
@@ -264,6 +266,7 @@ public class ShowColumnDao extends HibernateDao {
 				thisShowColumn.setWidth(showColumn.getWidth());
 				thisShowColumn.setAlign(showColumn.getAlign());
 				thisShowColumn.setQuotaItemViewTableManage(quotaItemViewTableManage);
+				thisShowColumn.setFilterMapColumnName(showColumn.getFilterMapColumnName());
 				session.merge(thisShowColumn);
 			}
 		} catch (Exception e) {

@@ -71,13 +71,13 @@ public class QuotaItemViewTableManageDao extends HibernateDao {
 				session.flush();
 				session.clear();
 			} catch (Exception e) {
-				System.out.print(e.toString());
+				System.out.println(e.toString());
 			}finally{
 				session.flush();
 				session.close();
 			}
 		} else {
-			System.out.print("已经存在"+year+"年指标信息总表记录");
+			System.out.println("已经存在"+year+"年指标信息总表记录");
 		}	
 	}
 	
@@ -118,7 +118,7 @@ public class QuotaItemViewTableManageDao extends HibernateDao {
 				session.clear();
 			}
 		} catch (Exception e) {
-			System.out.print(e.toString());
+			System.out.println(e.toString());
 		}finally{
 			session.flush();
 			session.close();
@@ -135,7 +135,7 @@ public class QuotaItemViewTableManageDao extends HibernateDao {
 				session.clear();
 			}
 		} catch (Exception e) {
-			System.out.print(e.toString());
+			System.out.println(e.toString());
 		}finally{
 			session.flush();
 			session.close();
@@ -160,7 +160,7 @@ public class QuotaItemViewTableManageDao extends HibernateDao {
 				session.clear();
 			}
 		} catch (Exception e) {
-			System.out.print(e.toString());
+			System.out.println(e.toString());
 		}finally{
 			session.flush();
 			session.close();

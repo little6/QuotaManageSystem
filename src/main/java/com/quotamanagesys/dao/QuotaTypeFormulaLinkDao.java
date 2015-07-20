@@ -138,24 +138,30 @@ public class QuotaTypeFormulaLinkDao extends HibernateDao {
 	
 	//清除指标种类关联的计算公式
 	@Expose
-	public void clearQuotaTypeFormulaLink(Collection<QuotaType> quotaTypes){
+	public void clearQuotaTypesFormulaLink(Collection<QuotaType> quotaTypes){
+		for (QuotaType quotaType : quotaTypes) {
+			clearQuotaTypeFormulaLink(quotaType);
+		}
+	}
+	
+	//清除指标种类关联的计算公式
+	@Expose
+	public void clearQuotaTypeFormulaLink(QuotaType quotaType){
 		Session session=this.getSessionFactory().openSession();
 		try {
-			for (QuotaType quotaType : quotaTypes) {
-				Collection<QuotaTypeFormulaLink> quotaTypeFormulaLinks=getQuotaTypeFormulaLinksByQuotaType(quotaType.getId());
-				for (QuotaTypeFormulaLink quotaTypeFormulaLink : quotaTypeFormulaLinks) {
-					quotaTypeFormulaLink.setQuotaFormula(null);
-					quotaTypeFormulaLink.setQuotaType(null);
-					quotaTypeFormulaLink.setFormulaParameters(null);
-					session.delete(quotaTypeFormulaLink);
-					session.flush();
-					session.clear();
-				}
+			Collection<QuotaTypeFormulaLink> quotaTypeFormulaLinks=getQuotaTypeFormulaLinksByQuotaType(quotaType.getId());
+			for (QuotaTypeFormulaLink quotaTypeFormulaLink : quotaTypeFormulaLinks) {
+				quotaTypeFormulaLink.setQuotaFormula(null);
+				quotaTypeFormulaLink.setQuotaType(null);
+				quotaTypeFormulaLink.setFormulaParameters(null);
+				session.delete(quotaTypeFormulaLink);
+				session.flush();
+				session.clear();
 			}
 		} catch (Exception e) {
 			System.out.print(e.toString());
 		}finally{
-			session.flush();
+			session.flush();			
 			session.close();
 		}
 	}

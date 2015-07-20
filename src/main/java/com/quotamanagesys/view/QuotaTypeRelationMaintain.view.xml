@@ -41,6 +41,12 @@
         <Property name="parameter">$${this.id}</Property>
         <Property name="dataProvider">quotaTypeDao#getFatherQuotaType</Property>
       </Reference>
+      <PropertyDef name="calculationFormulaInfo">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="quotaDefinitionInfo">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
     </DataType>
     <DataType name="QuotaProfession">
       <Property name="creationType">com.quotamanagesys.model.QuotaProfession</Property>
@@ -159,7 +165,7 @@ dorado.MessageBox.confirm(&quot;您真的要保存吗?&quot;,function(){&#xD;
 			dsQuotaType.flushAsync();&#xD;
 			dgQuotaType.refresh();&#xD;
         }&#xD;
-		else{alert(&quot;执行失败！发生异常：&quot; + obj);}}&#xD;
+		else{}}&#xD;
 });&#xD;
 &#xD;
 });&#xD;
@@ -291,6 +297,14 @@ dorado.MessageBox.confirm(&quot;您真的要保存吗?&quot;,function(){&#xD;
               <Property name="width">50</Property>
               <Property name="align">center</Property>
               <Property name="readOnly">true</Property>
+            </DataColumn>
+            <DataColumn name="calculationFormulaInfo">
+              <Property name="property">calculationFormulaInfo</Property>
+              <Property name="visible">false</Property>
+            </DataColumn>
+            <DataColumn name="quotaDefinitionInfo">
+              <Property name="property">quotaDefinitionInfo</Property>
+              <Property name="visible">false</Property>
             </DataColumn>
           </DataGrid>
           <UpdateAction id="uaQuotaType">

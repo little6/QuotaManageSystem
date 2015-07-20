@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -13,7 +12,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.apache.tools.ant.taskdefs.optional.javah.Kaffeh;
 import org.hibernate.Session;
 import org.hibernate.transform.Transformers;
 import org.springframework.stereotype.Component;
@@ -96,7 +94,7 @@ public class ResultTableCreator extends HibernateDao{
 				if (quotaItemId!=null) {
 					quotaItemIds.add(quotaItemId);
 				}else {
-					System.out.print("quotaId is null"+'\n');
+					System.out.println("quotaId is null"+'\n');
 				}		
 			}
 	
@@ -106,7 +104,11 @@ public class ResultTableCreator extends HibernateDao{
 					if ((quotaItem.getId()).equals(quotaItemId)) {
 						isDoUpdate=true;
 						String updateString=getUpdateQuotaItemValuesToTableString(quotaItem, tableName);
-						excuteSQL(updateString);
+						try {
+							excuteSQL(updateString);
+						} catch (Exception e) {
+							System.out.println(e.toString());
+						}
 						quotaItemIds.remove(quotaItemId);
 						break;
 					}else {
@@ -116,9 +118,13 @@ public class ResultTableCreator extends HibernateDao{
 				if (isDoUpdate==false) {
 					String insertSqlString=getInsertQuotaItemValuesIntoTableString(quotaItem,tableName);
 					if (insertSqlString!=null) {
-						excuteSQL(insertSqlString);
+						try {
+							excuteSQL(insertSqlString);
+						} catch (Exception e) {
+							System.out.println(e.toString());
+						}
 					} else {
-						System.out.print(quotaItem.getId()+'\n');
+						System.out.println(quotaItem.getId()+'\n');
 					}	
 				}
 			}	
@@ -129,7 +135,7 @@ public class ResultTableCreator extends HibernateDao{
 				if (insertSqlString!=null) {
 					excuteSQL(insertSqlString);
 				} else {
-					System.out.print(quotaItem.getId()+'\n');
+					System.out.println(quotaItem.getId()+'\n');
 				}
 			}
 		}
@@ -162,23 +168,12 @@ public class ResultTableCreator extends HibernateDao{
 		}
 		
 		if (isSuccess) {
-			ArrayList<String> quotaItemIds=new ArrayList<String>();
-			while (rs.next()) {
-				String quotaItemId=rs.getString("指标id");
-				quotaItemIds.add(quotaItemId);
-			}
 			for (QuotaItem quotaItem : quotaItems) {
-				for (String quotaItemId : quotaItemIds) {
-					if ((quotaItem.getId()).equals(quotaItemId)) {
-						String deleteString="DELETE FROM "+tableName+" WHERE 指标id='"+quotaItemId+"'";
-						excuteSQL(deleteString);
-						quotaItemIds.remove(quotaItemId);
-						break;
-					}
-				}
+				String deleteString="DELETE FROM "+tableName+" WHERE 指标id='"+quotaItem.getId()+"'";
+				excuteSQL(deleteString);
 			}	
 		}else {
-			System.out.print("数据表不存在，无需执行删除操作");
+			System.out.println("数据表不存在，无需执行删除操作");
 		}
 		conn.close();
 	}
@@ -212,7 +207,7 @@ public class ResultTableCreator extends HibernateDao{
 		
 		if (quotaItem.isAllowSubmit()==false) {
 			staticSetString="指标名称='"+quotaType.getName()+"'"
-					+ ",指标专业='"+quotaType.getName()+"'"
+					+ ",指标专业='"+quotaType.getQuotaProfession().getName()+"'"
 					+ ",指标级别='"+quotaType.getQuotaLevel().getName()+"'"
 					+ ",计量单位='"+quotaType.getQuotaUnit().getName()+"'"
 					+ ",小数位数="+quotaType.getDigit()
@@ -236,7 +231,7 @@ public class ResultTableCreator extends HibernateDao{
 					+",填报超时="+quotaItem.isOverTime();
 		}else {
 			staticSetString="指标名称='"+quotaType.getName()+"'"
-					+ ",指标专业='"+quotaType.getName()+"'"
+					+ ",指标专业='"+quotaType.getQuotaProfession().getName()+"'"
 					+ ",指标级别='"+quotaType.getQuotaLevel().getName()+"'"
 					+ ",计量单位='"+quotaType.getQuotaUnit().getName()+"'"
 					+ ",小数位数="+quotaType.getDigit()
@@ -451,7 +446,7 @@ public class ResultTableCreator extends HibernateDao{
 			}
 			return sqlString;
 		} catch (Exception e) {
-			System.out.print(quotaItem.getId()+"抛出异常为："+e.toString()+'\n');
+			System.out.println(quotaItem.getId()+"抛出异常为："+e.toString()+'\n');
 			return null;
 		}
 	}
@@ -556,7 +551,7 @@ public class ResultTableCreator extends HibernateDao{
 			Connection conn = DriverManager.getConnection(url, user, password);
 			return conn;
 	     }catch(Exception e){
-	    	System.out.print(e.toString());
+	    	System.out.println(e.toString());
 	    	return null;
 	     }
 	}
