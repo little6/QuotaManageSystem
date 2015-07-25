@@ -1,9 +1,14 @@
 package com.quotamanagesys.tools;
 
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -23,31 +28,19 @@ import com.bstek.dorado.annotation.Expose;
 
 @Component
 public class PoiReadExcel {
-	
+
 	@DataProvider
-	public String getHtml(){
-		String htmlString="";
+	public String getHtml() {
+		String htmlString = "";
 		try {
 			PoiReadExcel poire = new PoiReadExcel();
 			String path = "C:\\DC_\\河池供电局X年X月关键业绩考核指标完成情况表.xls";
-			htmlString=poire.read(path).toString();
+			htmlString = poire.read(path).toString();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return htmlString;
 	}
-	
-	/*
-	public static void main(String[] args) {
-		try {
-			POIReadExcel poire = new POIReadExcel();
-			String path = "C:\\DC_\\河池供电局X年X月关键业绩考核指标完成情况表.xls";
-			System.out.println(poire.read(path));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	*/
 	
 	/**
 	 * 读取 Excel 显示页面.
@@ -56,12 +49,25 @@ public class PoiReadExcel {
 	 * @return
 	 * @throws Exception
 	 */
+	
+	
 	public StringBuffer read(String fileName) throws Exception {
 		HSSFSheet sheet = null;
 		StringBuffer lsb = new StringBuffer();
 		String excelFileName = fileName;
+
+		lsb.append("<!DOCTYPE html><html><head>"
+				+"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=gb2312\" />"
+				
+				+ "</head><body>");
+
 		try {
-			HSSFWorkbook workbook = new HSSFWorkbook(new FileInputStream(excelFileName)); // 获整个Excel
+			HSSFWorkbook workbook = new HSSFWorkbook(new FileInputStream(
+					excelFileName)); // 获整个Excel
+			
+			lsb.append("<script type=\"text/javascript\" src=\"jq/js/jquery-1.9.1.js\"></script>"
+					+"<script type=\"text/javascript\" src=\"jq/js/jquery.freezeheader.js\"></script>"
+					+ "<link rel=\"stylesheet\" type=\"text/css\" href=\"jq/css/style.css\" />");
 
 			for (int sheetIndex = 0; sheetIndex < workbook.getNumberOfSheets(); sheetIndex++) {
 				sheet = workbook.getSheetAt(sheetIndex);// 获所有的sheet
@@ -71,9 +77,10 @@ public class PoiReadExcel {
 					if (sheet != null) {
 						int firstRowNum = sheet.getFirstRowNum(); // 第一行
 						int lastRowNum = sheet.getLastRowNum(); // 最后一行
-						// 构造Table
-						lsb.append("<table width=\"100%\" style=\"border:1px solid #000;border-width:1px 0 0 1px;margin:2px 0 2px 0;border-collapse:collapse;\">");
-						for (int rowNum = firstRowNum; rowNum <= lastRowNum; rowNum++) {
+						// 构造Table表头
+						lsb.append("<table class=\"gridView\" id=\"table1\" width=\"100%\" style=\"border:1px solid #000;border-width:1px 0 0 1px;margin:2px 0 2px 0;border-collapse:collapse;\">");
+						lsb.append("<thead>");
+						for (int rowNum = firstRowNum; rowNum <= 1; rowNum++) {
 							if (sheet.getRow(rowNum) != null) {// 如果行不为空，
 								HSSFRow row = sheet.getRow(rowNum);
 								short firstCellNum = row.getFirstCellNum(); // 该行的第一个单元格
@@ -155,16 +162,115 @@ public class PoiReadExcel {
 								lsb.append("</tr>");
 							}
 						}
+						lsb.append("</thead>");
+
+						lsb.append("<tbody>");
+						for (int rowNum = firstRowNum + 2; rowNum <= lastRowNum; rowNum++) {
+							if (sheet.getRow(rowNum) != null) {// 如果行不为空，
+								HSSFRow row = sheet.getRow(rowNum);
+								short firstCellNum = row.getFirstCellNum(); // 该行的第一个单元格
+								short lastCellNum = row.getLastCellNum(); // 该行的最后一个单元格
+								int height = (int) (row.getHeight() / 15.625); // 行的高度
+								lsb.append("<tr height=\""
+										+ height
+										+ "\" style=\"border:1px solid #000;border-width:0 1px 1px 0;margin:2px 0 2px 0;\">");
+								for (short cellNum = firstCellNum; cellNum <= lastCellNum; cellNum++) { // 循环该行的每一个单元格
+									HSSFCell cell = row.getCell(cellNum);
+									if (cell != null) {
+										if (cell.getCellType() == HSSFCell.CELL_TYPE_BLANK) {
+											continue;
+										} else {
+											StringBuffer tdStyle = new StringBuffer(
+													"<td style=\"border:1px solid #000; border-width:0 1px 1px 0;margin:2px 0 2px 0; ");
+											HSSFCellStyle cellStyle = cell
+													.getCellStyle();
+											HSSFPalette palette = workbook
+													.getCustomPalette(); // 类HSSFPalette用于求颜色的国际标准形式
+											HSSFColor hColor = palette
+													.getColor(cellStyle
+															.getFillForegroundColor());
+											HSSFColor hColor2 = palette
+													.getColor(cellStyle
+															.getFont(workbook)
+															.getColor());
+
+											String bgColor = convertToStardColor(hColor);// 背景颜色
+											short boldWeight = cellStyle
+													.getFont(workbook)
+													.getBoldweight(); // 字体粗细
+											short fontHeight = (short) (cellStyle
+													.getFont(workbook)
+													.getFontHeight() / 2); // 字体大小
+											String fontColor = convertToStardColor(hColor2); // 字体颜色
+											if (bgColor != null
+													&& !"".equals(bgColor
+															.trim())) {
+												tdStyle.append(" background-color:"
+														+ bgColor + "; ");
+											}
+											if (fontColor != null
+													&& !"".equals(fontColor
+															.trim())) {
+												tdStyle.append(" color:"
+														+ fontColor + "; ");
+											}
+											tdStyle.append(" font-weight:"
+													+ boldWeight + "; ");
+											tdStyle.append(" font-size: "
+													+ fontHeight + "%;");
+											lsb.append(tdStyle + "\"");
+
+											int width = (int) (sheet
+													.getColumnWidth(cellNum) / 35.7); //
+											int cellReginCol = getMergerCellRegionCol(
+													sheet, rowNum, cellNum); // 合并的列（solspan）
+											int cellReginRow = getMergerCellRegionRow(
+													sheet, rowNum, cellNum);// 合并的行（rowspan）
+											String align = convertAlignToHtml(cellStyle
+													.getAlignment()); //
+											String vAlign = convertVerticalAlignToHtml(cellStyle
+													.getVerticalAlignment());
+
+											lsb.append(" align=\"" + align
+													+ "\" valign=\"" + vAlign
+													+ "\" width=\"" + width
+													+ "\" ");
+											lsb.append(" colspan=\""
+													+ cellReginCol
+													+ "\" rowspan=\""
+													+ cellReginRow + "\"");
+											lsb.append(">" + getCellValue(cell)
+													+ "</td>");
+										}
+									}
+								}
+								lsb.append("</tr>");
+							}
+						}
+						lsb.append("</tbody>");
+						lsb.append("</table>");
 					}
 				}
 			}
 		} catch (FileNotFoundException e) {
-			
+
 		} catch (IOException e) {
-			
+
 		}
+		lsb.append("<script type=\"text/javascript\">alert(\"<body>中代码被执行\");$(\"#table1\").freezeHeader();</script>");
+		
+		lsb.append("</body></html>");
+		
+		
+		String fileName2="C:\\Users\\mathide\\git\\QuotaManageSystem\\QuotaManageSystem\\src\\main\\webapp\\ff.html";
+		FileOutputStream fo=new FileOutputStream(fileName2);
+		fo.write(lsb.toString().getBytes());
+		fo.close();
+		
 		return lsb;
 	}
+	
+	
 
 	/**
 	 * 取得单元格的值

@@ -63,7 +63,7 @@ year=parseInt(teYear.get(&quot;text&quot;));&#xD;
 teMonth=view.get(&quot;#teMonth&quot;);&#xD;
 month=teMonth.get(&quot;text&quot;);&#xD;
 dsPointQuotaViewHtml=view.get(&quot;#dsPointQuotaViewHtml&quot;);&#xD;
-hc1=view.get(&quot;#hc1&quot;);&#xD;
+ifr=view.get(&quot;#ifr&quot;);&#xD;
 aaWriteExcel=view.get(&quot;#aaWriteExcel&quot;);&#xD;
 &#xD;
 aaWriteExcel.set(&quot;parameter&quot;,{year:year,month:month});&#xD;
@@ -71,10 +71,9 @@ aaWriteExcel.execute({&#xD;
 	callback : function(success, obj){&#xD;
 		if (success) {&#xD;
 			dsPointQuotaViewHtml.flush();&#xD;
-			var html=dsPointQuotaViewHtml.getData();&#xD;
-			hc1.refresh(true);&#xD;
-			hc1.set(&quot;content&quot;,html);&#xD;
-			hc1.refresh(true);&#xD;
+			ifr.set(&quot;path&quot;, &quot;ff.html?&quot; + new Date().getTime());&#xD;
+			ifr.reload();&#xD;
+			ifr.refresh();&#xD;
         }&#xD;
 	}&#xD;
 });</ClientEvent>
@@ -163,11 +162,6 @@ aaDownLoadFile.execute();</ClientEvent>
       <Property name="parameter"></Property>
       <Property name="inlineMode">browser</Property>
     </DownloadAction>
-    <HtmlContainer id="hc1">
-      <Property name="visible">true</Property>
-      <Property name="width">100%</Property>
-      <Property name="hideMode">visibility</Property>
-      <Property name="containerUi">default</Property>
-    </HtmlContainer>
+    <IFrame id="ifr"/>
   </View>
 </ViewConfig>

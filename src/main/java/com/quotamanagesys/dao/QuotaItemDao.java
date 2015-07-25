@@ -82,6 +82,18 @@ public class QuotaItemDao extends HibernateDao {
 	}
 	
 	@DataProvider
+	public QuotaItem getQuotaItemByNameAndYearAndMonthAndCover(String name,int year,int month,String coverName){
+		String hqlString = "from " + QuotaItem.class.getName() + " where quotaItemCreator.quotaType.name='"+ name + "'"
+				+" and year="+year+" and month="+month+" and quotaItemCreator.quotaCover.name='"+coverName+"'";
+		List<QuotaItem> quotaItems = this.query(hqlString);
+		if (quotaItems.size() > 0) {
+			return quotaItems.get(0);
+		} else {
+			return null;
+		}
+	}
+	
+	@DataProvider
 	public Collection<QuotaItem> getQuotaItemsByManageDept(String manageDeptId) {
 		String hqlString = "from " + QuotaItem.class.getName()
 				+ " where quotaItemCreator.quotaType.manageDept.id='"+ manageDeptId 

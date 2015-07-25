@@ -417,6 +417,10 @@ dsQuotaItemCreatorWithoutFormulas.flushAsync();</ClientEvent>
             <Property name="icon">url(>skin>common/icons.gif) -220px -80px</Property>
           </MenuItem>
         </MenuButton>
+        <ToolBarButton>
+          <Property name="action">aaPushValueToPmis</Property>
+          <Property name="caption">ggg</Property>
+        </ToolBarButton>
       </ToolBar>
       <SplitPanel>
         <Property name="position">140</Property>
@@ -2620,6 +2624,9 @@ dsQuotaProperty.set(&quot;parameter&quot;,{quotaItemCreatorId:null}).flushAsync(
         <Property name="service">quotaItemCreatorDao#repairQuotaItemDutyDept</Property>
         <Property name="successMessage">纠正责任部门完成！</Property>
         <Property name="executingMessage">纠正责任部门...</Property>
+      </AjaxAction>
+      <AjaxAction id="aaPushValueToPmis">
+        <Property name="service">pushValueToPmis#pushFinishValue</Property>
       </AjaxAction>
     </Container>
   </View>
