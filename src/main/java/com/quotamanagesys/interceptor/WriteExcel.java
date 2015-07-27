@@ -126,7 +126,7 @@ public class WriteExcel extends HibernateDao{
 										font.setColor(color.getIndex());
 										cellStyle.setFont(font);
 										row.getCell(11).setCellStyle(cellStyle);
-										row.getCell(11).setCellValue("¡ñ");
+										row.getCell(11).setCellValue("¡ö¡ö");
 									} else if (gskhjk.equals("1.0")) {
 										HSSFFont font=row.getCell(11).getCellStyle().getFont(workbook);
 										HSSFPalette palette=workbook.getCustomPalette();
@@ -135,7 +135,7 @@ public class WriteExcel extends HibernateDao{
 										font.setColor(color.getIndex());
 										cellStyle.setFont(font);
 										row.getCell(11).setCellStyle(cellStyle);
-										row.getCell(11).setCellValue("¡ñ");
+										row.getCell(11).setCellValue("¡ö¡ö");
 									}
 								}
 							}else {

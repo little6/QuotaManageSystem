@@ -6,15 +6,14 @@
     <Attribute name="year"/>
   </Context>
   <Model/>
-  <View>
+  <View id="v1">
+    <ClientEvent name="onResize">alert(self.get(&quot;id&quot;)+&quot;:&quot;+self.get(&quot;height&quot;));&#xD;
+alert($(document).height());</ClientEvent>
     <Property name="visible">true</Property>
-    <Property name="width">100%</Property>
-    <Property name="height">100%</Property>
     <Property name="contentOverflowY">visible</Property>
     <Property name="contentOverflowX">visible</Property>
     <Property name="contentOverflow">visible</Property>
-    <Property name="javaScriptFile">/freezeheader.js</Property>
-    <Property name="styleSheetFile">/jq/css/style.css</Property>
+    <Property name="styleSheetFile">/optv/optvstyle1.css</Property>
     <YearDropDown id="yddYear"/>
     <ListDropDown id="lddMonth">
       <Property name="items">
@@ -156,7 +155,6 @@ aaWriteExcel.execute({&#xD;
 			hc1.refresh(true);&#xD;
 			hc1.set(&quot;content&quot;,html);&#xD;
 			hc1.refresh(true);&#xD;
-			$(&quot;#table1&quot;).freezeHeader({ 'height': ($(window).height()-26)+&quot;px&quot;});&#xD;
         }&#xD;
 	}&#xD;
 });</ClientEvent>
@@ -177,13 +175,9 @@ aaDownLoadFile.execute();</ClientEvent>
       </ToolBarButton>
     </ToolBar>
     <HtmlContainer id="hc1" listener="spring:keyPointQuotaItemViewInit#Hc1Init">
-      <ClientEvent name="onReady">$(&quot;#table1&quot;).freezeHeader({ 'height': ($(window).height()-26)+&quot;px&quot;});</ClientEvent>
-      <ClientEvent name="onClick">self.set(&quot;height&quot;,$(window).height()-26);&#xD;
-alert(view.get(&quot;#hc1&quot;).get(&quot;height&quot;));&#xD;
-alert(view.get(&quot;#hc1&quot;).get(&quot;width&quot;));&#xD;
-$(&quot;#table1&quot;).freezeHeader({ 'height': (hc1_height-26)+&quot;px&quot;});</ClientEvent>
+      <ClientEvent name="onDoubleClick">alert($(&quot;#scrollTable&quot;).height());&#xD;
+$(&quot;#scrollTable&quot;).css(&quot;height&quot;,$(&quot;#scrollTable&quot;).height()+&quot;px&quot;);</ClientEvent>
       <Property name="visible">true</Property>
-      <Property name="width">100%</Property>
       <Property name="hideMode">visibility</Property>
       <Property name="containerUi">default</Property>
       <Property name="draggable">false</Property>

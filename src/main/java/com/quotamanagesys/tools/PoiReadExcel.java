@@ -56,10 +56,8 @@ public class PoiReadExcel {
 		StringBuffer lsb = new StringBuffer();
 		String excelFileName = fileName;
 
-		lsb.append("<!DOCTYPE html><html><head>"
-				+"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=gb2312\" />"
-				+ "<link rel=\"stylesheet\" type=\"text/css\" href=\"jq/css/style.css\" />"
-				+ "</head><body><div>");
+		lsb.append("<div id=\"scrollTable\">"
+				+"<div style=\"overflow-y:scroll;height:100px\">");
 
 		try {
 			HSSFWorkbook workbook = new HSSFWorkbook(new FileInputStream(
@@ -157,9 +155,9 @@ public class PoiReadExcel {
 								lsb.append("</tr>");
 							}
 						}
-						lsb.append("</thead>");
+						lsb.append("</thead></table></div>");
 
-						lsb.append("<tbody>");
+						lsb.append("<div id=\"maincontent\"><table class=\"tbody\" style=\"table-layout:fixed\"><tbody>");
 						for (int rowNum = firstRowNum + 2; rowNum <= lastRowNum; rowNum++) {
 							if (sheet.getRow(rowNum) != null) {// 如果行不为空，
 								HSSFRow row = sheet.getRow(rowNum);
@@ -243,6 +241,7 @@ public class PoiReadExcel {
 							}
 						}
 						lsb.append("</tbody>");
+						
 						lsb.append("</table></div>");
 					}
 				}
@@ -252,17 +251,10 @@ public class PoiReadExcel {
 		} catch (IOException e) {
 
 		}
-		lsb.append("</body></html>");
-			
-		String fileName2="C:\\Users\\mathide\\git\\QuotaManageSystem\\QuotaManageSystem\\src\\main\\webapp\\ff.html";
-		FileOutputStream fo=new FileOutputStream(fileName2);
-		fo.write(lsb.toString().getBytes());
-		fo.close();
+		lsb.append("</div>");
 		
 		return lsb;
 	}
-	
-	
 
 	/**
 	 * 取得单元格的值

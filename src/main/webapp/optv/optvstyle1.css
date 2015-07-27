@@ -1,0 +1,42 @@
+@CHARSET "UTF-8";
+#scrollTable {
+  width:100%;
+  border: 1px solid #EB8;/*table没有外围的border，只有内部的td或th有border*/
+  background: #ECE9D8;
+}
+
+
+#scrollTable table {
+  border-collapse:collapse; /*统一设置两个table为细线表格*/
+}
+
+#scrollTable table.thead{ /*表头*/
+  /*div的第一个子元素*/
+  width:100%;
+}
+
+#scrollTable table.thead th{/*表头*/
+  border: 1px solid #EB8;
+  border-right:#C96;
+  color:#fff;
+  background: #ECE9D8;/*亮桔黄色*/
+}
+
+#scrollTable div{/*能带滚动条的表身*/
+  /*div的第二个子元素*/
+  width:100%;
+  height:690px;
+  overflow:auto;/*必需*/
+}
+
+#scrollTable table.tbody{/*能带滚动条的表身的正体*/
+  width:100%;
+  border: 1px solid #C96;
+  border-right:#B74;
+  color:#666666;
+  background: #ECE9D8;
+}
+#scrollTable table.tbody td{/*能带滚动条的表身的格子*/
+  border:1px solid #C96;
+  WORD-WRAP: break-word;
+}
