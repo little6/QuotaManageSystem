@@ -477,7 +477,40 @@ aaWriteExcel.execute({&#xD;
         }&#xD;
 	}&#xD;
 });</ClientEvent>
-        <Property name="caption">下载指标完成情况表</Property>
+        <Property name="caption">下载指标表（局领导）</Property>
+      </ToolBarButton>
+      <ToolBarButton>
+        <ClientEvent name="onClick">var teYear=view.get(&quot;#teYear&quot;);&#xD;
+var year=parseInt(teYear.get(&quot;text&quot;));&#xD;
+var teMonth=view.get(&quot;#teMonth&quot;);&#xD;
+var month=teMonth.get(&quot;text&quot;);&#xD;
+switch(month){&#xD;
+	case &quot;月度&quot;:&#xD;
+		month=13;&#xD;
+		break;&#xD;
+	case &quot;年度&quot;:&#xD;
+		month=14;&#xD;
+		break;&#xD;
+	case &quot;全部&quot;:&#xD;
+		month=15;&#xD;
+		break;&#xD;
+	default:&#xD;
+		month=parseInt(teMonth.get(&quot;text&quot;));&#xD;
+		break;&#xD;
+}&#xD;
+&#xD;
+var aaWriteExcel2=view.get(&quot;#aaWriteExcel2&quot;);&#xD;
+aaWriteExcel2.set(&quot;parameter&quot;,{year:year,month:month});&#xD;
+aaWriteExcel2.execute({&#xD;
+	callback : function(success, obj){&#xD;
+		if (success) {&#xD;
+			var aaDownLoadFile2=view.get(&quot;#aaDownLoadFile2&quot;);&#xD;
+			aaDownLoadFile2.set(&quot;parameter&quot;,{year:year,month:month});&#xD;
+			aaDownLoadFile2.execute();&#xD;
+        }&#xD;
+	}&#xD;
+});</ClientEvent>
+        <Property name="caption">下载指标表（办公室）</Property>
       </ToolBarButton>
       <Fill/>
       <DataPilot>
@@ -985,5 +1018,13 @@ aaUpdateQuotaItemViewMapsDefaultView.execute({&#xD;
       <Property name="inlineMode">browser</Property>
       <Property name="caption">下载该模块说明书</Property>
     </DownloadAction>
+    <DownloadAction id="aaDownLoadFile2">
+      <Property name="fileProvider">downLoadFile#download2</Property>
+      <Property name="parameter"></Property>
+      <Property name="inlineMode">browser</Property>
+    </DownloadAction>
+    <AjaxAction id="aaWriteExcel2">
+      <Property name="service">writeExcel#writeExcel2</Property>
+    </AjaxAction>
   </View>
 </ViewConfig>

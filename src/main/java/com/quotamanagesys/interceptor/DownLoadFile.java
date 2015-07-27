@@ -49,4 +49,15 @@ public class DownLoadFile {
 	    return downloadFile;
 	}
 	
+	@FileProvider
+	public DownloadFile download2(Map<String,String> parameter) throws IOException{
+		String year=parameter.get("year");
+		String month=parameter.get("month");
+		String fileName="C:\\DC_\\河池供电局XX年XX月指标完成情况（办公室关注指标）.xls";
+		//String fileName="C:\\DC_\\河池供电局"+year+"年"+month+"月关键业绩考核指标完成情况表.xlsx";
+		
+	    DownloadFile downloadFile= new DownloadFile(new File(URLEncoder.encode(fileName, "UTF-8")));
+	    return downloadFile;
+	}
+	
 }

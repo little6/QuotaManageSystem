@@ -1,103 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ViewConfig>
   <Arguments/>
-  <Context/>
+  <Context>
+    <Attribute name="month"/>
+    <Attribute name="year"/>
+  </Context>
   <Model/>
   <View>
     <Property name="visible">true</Property>
     <Property name="width">100%</Property>
-    <ToolBar>
-      <Property name="fixRight">true</Property>
-      <Separator/>
-      <ToolBarLabel>
-        <Property name="text">年度</Property>
-      </ToolBarLabel>
-      <TextEditor id="teYear">
-        <ClientEvent name="onReady">var date=new Date();&#xD;
-var year;&#xD;
-var month=date.getMonth();&#xD;
-&#xD;
-var Sys = {};&#xD;
-var ua = navigator.userAgent.toLowerCase();&#xD;
-window.ActiveXObject ? Sys.ie = ua.match(/msie ([\d.]+)/)[1] :&#xD;
-document.getBoxObjectFor ? Sys.firefox = ua.match(/firefox\/([\d.]+)/)[1] :&#xD;
-window.MessageEvent &amp;&amp; !document.getBoxObjectFor ? Sys.chrome = ua.match(/chrome\/([\d.]+)/)[1] :&#xD;
-window.opera ? Sys.opera = ua.match(/opera.([\d.]+)/)[1] :&#xD;
-window.openDatabase ? Sys.safari = ua.match(/version\/([\d.]+)/)[1] : 0;&#xD;
-&#xD;
-//以下进行测试&#xD;
-if(Sys.ie){&#xD;
-	year=(date.getYear());&#xD;
-}else if(Sys.chrome){&#xD;
-	year=(date.getYear())+1900;&#xD;
-}&#xD;
-&#xD;
-if(month==0){&#xD;
-	year=year-1;&#xD;
-}&#xD;
-self.set(&quot;text&quot;,year);&#xD;
-view.set(&quot;context.year&quot;,year);</ClientEvent>
-        <Property name="trigger">yddYear</Property>
-        <Property name="width">70</Property>
-      </TextEditor>
-      <ToolBarLabel>
-        <Property name="text">月度</Property>
-      </ToolBarLabel>
-      <TextEditor id="teMonth">
-        <ClientEvent name="onReady">var date=new Date();&#xD;
-var year;&#xD;
-var month=date.getMonth();&#xD;
-&#xD;
-if(month==0){&#xD;
-	month=12;&#xD;
-}&#xD;
-self.set(&quot;text&quot;,month);&#xD;
-view.set(&quot;context.month&quot;,month);</ClientEvent>
-        <Property name="trigger">lddMonth</Property>
-        <Property name="width">70</Property>
-      </TextEditor>
-      <Separator/>
-      <ToolBarButton>
-        <ClientEvent name="onClick">teYear=view.get(&quot;#teYear&quot;);&#xD;
-year=parseInt(teYear.get(&quot;text&quot;));&#xD;
-teMonth=view.get(&quot;#teMonth&quot;);&#xD;
-month=teMonth.get(&quot;text&quot;);&#xD;
-dsPointQuotaViewHtml=view.get(&quot;#dsPointQuotaViewHtml&quot;);&#xD;
-hc1=view.get(&quot;#hc1&quot;);&#xD;
-aaWriteExcel=view.get(&quot;#aaWriteExcel&quot;);&#xD;
-&#xD;
-aaWriteExcel.set(&quot;parameter&quot;,{year:year,month:month});&#xD;
-aaWriteExcel.execute({&#xD;
-	callback : function(success, obj){&#xD;
-		if (success) {&#xD;
-			dsPointQuotaViewHtml.flush();&#xD;
-			var html=dsPointQuotaViewHtml.getData();&#xD;
-			hc1.refresh(true);&#xD;
-			hc1.set(&quot;content&quot;,html);&#xD;
-			hc1.refresh(true);&#xD;
-        }&#xD;
-	}&#xD;
-});</ClientEvent>
-        <Property name="caption">查看</Property>
-        <Property name="icon">url(>skin>common/icons.gif) -220px -80px</Property>
-      </ToolBarButton>
-      <ToolBarButton>
-        <ClientEvent name="onClick">var teYear=view.get(&quot;#teYear&quot;);&#xD;
-var year=parseInt(teYear.get(&quot;text&quot;));&#xD;
-var teMonth=view.get(&quot;#teMonth&quot;);&#xD;
-var month=teMonth.get(&quot;text&quot;);&#xD;
-var aaDownLoadFile=view.get(&quot;#aaDownLoadFile&quot;);&#xD;
-&#xD;
-aaDownLoadFile.set(&quot;parameter&quot;,{year:year,month:month});&#xD;
-aaDownLoadFile.execute();</ClientEvent>
-        <Property name="caption">下载指标完成情况表</Property>
-        <Property name="visible">false</Property>
-      </ToolBarButton>
-    </ToolBar>
-    <DataSet id="dsPointQuotaViewHtml">
-      <Property name="dataType">String</Property>
-      <Property name="dataProvider">poiReadExcel#getHtml</Property>
-    </DataSet>
+    <Property name="height">100%</Property>
+    <Property name="contentOverflowY">visible</Property>
+    <Property name="contentOverflowX">visible</Property>
+    <Property name="contentOverflow">visible</Property>
+    <Property name="javaScriptFile">/freezeheader.js</Property>
+    <Property name="styleSheetFile">/jq/css/style.css</Property>
     <YearDropDown id="yddYear"/>
     <ListDropDown id="lddMonth">
       <Property name="items">
@@ -163,11 +80,114 @@ aaDownLoadFile.execute();</ClientEvent>
       <Property name="parameter"></Property>
       <Property name="inlineMode">browser</Property>
     </DownloadAction>
-    <HtmlContainer id="hc1">
+    <DataSet id="dsPointQuotaViewHtml">
+      <Property name="dataType">String</Property>
+      <Property name="dataProvider">poiReadExcel#getHtml</Property>
+    </DataSet>
+    <ToolBar>
+      <Property name="fixRight">true</Property>
+      <Property name="draggable">true</Property>
+      <Property name="hideMode">visibility</Property>
+      <Separator/>
+      <ToolBarLabel>
+        <Property name="text">年度</Property>
+      </ToolBarLabel>
+      <TextEditor id="teYear">
+        <ClientEvent name="onReady">var date=new Date();&#xD;
+var year;&#xD;
+var month=date.getMonth();&#xD;
+&#xD;
+var Sys = {};&#xD;
+var ua = navigator.userAgent.toLowerCase();&#xD;
+window.ActiveXObject ? Sys.ie = ua.match(/msie ([\d.]+)/)[1] :&#xD;
+document.getBoxObjectFor ? Sys.firefox = ua.match(/firefox\/([\d.]+)/)[1] :&#xD;
+window.MessageEvent &amp;&amp; !document.getBoxObjectFor ? Sys.chrome = ua.match(/chrome\/([\d.]+)/)[1] :&#xD;
+window.opera ? Sys.opera = ua.match(/opera.([\d.]+)/)[1] :&#xD;
+window.openDatabase ? Sys.safari = ua.match(/version\/([\d.]+)/)[1] : 0;&#xD;
+&#xD;
+//以下进行测试&#xD;
+if(Sys.ie){&#xD;
+	year=(date.getYear());&#xD;
+}else if(Sys.chrome){&#xD;
+	year=(date.getYear())+1900;&#xD;
+}&#xD;
+&#xD;
+if(month==0){&#xD;
+	year=year-1;&#xD;
+}&#xD;
+self.set(&quot;text&quot;,year);&#xD;
+view.set(&quot;context.year&quot;,year);</ClientEvent>
+        <Property name="trigger">yddYear</Property>
+        <Property name="width">70</Property>
+      </TextEditor>
+      <ToolBarLabel>
+        <Property name="text">月度</Property>
+      </ToolBarLabel>
+      <TextEditor id="teMonth">
+        <ClientEvent name="onReady">var date=new Date();&#xD;
+var year;&#xD;
+var month=date.getMonth();&#xD;
+&#xD;
+if(month==0){&#xD;
+	month=12;&#xD;
+}&#xD;
+self.set(&quot;text&quot;,month);&#xD;
+view.set(&quot;context.month&quot;,month);</ClientEvent>
+        <Property name="trigger">lddMonth</Property>
+        <Property name="width">70</Property>
+      </TextEditor>
+      <Separator/>
+      <ToolBarButton>
+        <ClientEvent name="onClick">teYear=view.get(&quot;#teYear&quot;);&#xD;
+year=parseInt(teYear.get(&quot;text&quot;));&#xD;
+teMonth=view.get(&quot;#teMonth&quot;);&#xD;
+month=teMonth.get(&quot;text&quot;);&#xD;
+dsPointQuotaViewHtml=view.get(&quot;#dsPointQuotaViewHtml&quot;);&#xD;
+hc1=view.get(&quot;#hc1&quot;);&#xD;
+aaWriteExcel=view.get(&quot;#aaWriteExcel&quot;);&#xD;
+dlgView=view.get(&quot;#dlgView&quot;);&#xD;
+&#xD;
+aaWriteExcel.set(&quot;parameter&quot;,{year:year,month:month});&#xD;
+aaWriteExcel.execute({&#xD;
+	callback : function(success, obj){&#xD;
+		if (success) {&#xD;
+			dsPointQuotaViewHtml.flush();&#xD;
+			var html=dsPointQuotaViewHtml.getData();&#xD;
+			hc1.refresh(true);&#xD;
+			hc1.set(&quot;content&quot;,html);&#xD;
+			hc1.refresh(true);&#xD;
+			$(&quot;#table1&quot;).freezeHeader({ 'height': ($(window).height()-26)+&quot;px&quot;});&#xD;
+        }&#xD;
+	}&#xD;
+});</ClientEvent>
+        <Property name="caption">查看</Property>
+        <Property name="icon">url(>skin>common/icons.gif) -220px -80px</Property>
+      </ToolBarButton>
+      <ToolBarButton>
+        <ClientEvent name="onClick">var teYear=view.get(&quot;#teYear&quot;);&#xD;
+var year=parseInt(teYear.get(&quot;text&quot;));&#xD;
+var teMonth=view.get(&quot;#teMonth&quot;);&#xD;
+var month=teMonth.get(&quot;text&quot;);&#xD;
+var aaDownLoadFile=view.get(&quot;#aaDownLoadFile&quot;);&#xD;
+&#xD;
+aaDownLoadFile.set(&quot;parameter&quot;,{year:year,month:month});&#xD;
+aaDownLoadFile.execute();</ClientEvent>
+        <Property name="caption">下载指标完成情况表</Property>
+        <Property name="visible">false</Property>
+      </ToolBarButton>
+    </ToolBar>
+    <HtmlContainer id="hc1" listener="spring:keyPointQuotaItemViewInit#Hc1Init">
+      <ClientEvent name="onReady">$(&quot;#table1&quot;).freezeHeader({ 'height': ($(window).height()-26)+&quot;px&quot;});</ClientEvent>
+      <ClientEvent name="onClick">self.set(&quot;height&quot;,$(window).height()-26);&#xD;
+alert(view.get(&quot;#hc1&quot;).get(&quot;height&quot;));&#xD;
+alert(view.get(&quot;#hc1&quot;).get(&quot;width&quot;));&#xD;
+$(&quot;#table1&quot;).freezeHeader({ 'height': (hc1_height-26)+&quot;px&quot;});</ClientEvent>
       <Property name="visible">true</Property>
       <Property name="width">100%</Property>
       <Property name="hideMode">visibility</Property>
       <Property name="containerUi">default</Property>
+      <Property name="draggable">false</Property>
+      <Property name="droppable">false</Property>
     </HtmlContainer>
   </View>
 </ViewConfig>

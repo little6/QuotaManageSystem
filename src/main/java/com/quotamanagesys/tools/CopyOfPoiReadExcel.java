@@ -27,13 +27,13 @@ import com.bstek.dorado.annotation.DataProvider;
 import com.bstek.dorado.annotation.Expose;
 
 @Component
-public class PoiReadExcel {
+public class CopyOfPoiReadExcel {
 
 	@DataProvider
 	public String getHtml() {
 		String htmlString = "";
 		try {
-			PoiReadExcel poire = new PoiReadExcel();
+			CopyOfPoiReadExcel poire = new CopyOfPoiReadExcel();
 			String path = "C:\\DC_\\河池供电局X年X月关键业绩考核指标完成情况表.xls";
 			htmlString = poire.read(path).toString();
 		} catch (Exception e) {
@@ -58,12 +58,17 @@ public class PoiReadExcel {
 
 		lsb.append("<!DOCTYPE html><html><head>"
 				+"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=gb2312\" />"
-				+ "<link rel=\"stylesheet\" type=\"text/css\" href=\"jq/css/style.css\" />"
-				+ "</head><body><div>");
+				
+				+ "</head><body>");
 
 		try {
 			HSSFWorkbook workbook = new HSSFWorkbook(new FileInputStream(
 					excelFileName)); // 获整个Excel
+			
+			lsb.append("<script type=\"text/javascript\" src=\"jq/js/jquery-1.9.1.js\"></script>"
+					+"<script type=\"text/javascript\" src=\"jq/js/jquery.freezeheader.js\"></script>"
+					+ "<link rel=\"stylesheet\" type=\"text/css\" href=\"jq/css/style.css\" />");
+
 			for (int sheetIndex = 0; sheetIndex < workbook.getNumberOfSheets(); sheetIndex++) {
 				sheet = workbook.getSheetAt(sheetIndex);// 获所有的sheet
 				String sheetName = workbook.getSheetName(sheetIndex); // sheetName
@@ -243,7 +248,7 @@ public class PoiReadExcel {
 							}
 						}
 						lsb.append("</tbody>");
-						lsb.append("</table></div>");
+						lsb.append("</table>");
 					}
 				}
 			}
@@ -252,8 +257,11 @@ public class PoiReadExcel {
 		} catch (IOException e) {
 
 		}
+		lsb.append("<script type=\"text/javascript\">alert(\"<body>中代码被执行\");$(\"#table1\").freezeHeader();</script>");
+		
 		lsb.append("</body></html>");
-			
+		
+		
 		String fileName2="C:\\Users\\mathide\\git\\QuotaManageSystem\\QuotaManageSystem\\src\\main\\webapp\\ff.html";
 		FileOutputStream fo=new FileOutputStream(fileName2);
 		fo.write(lsb.toString().getBytes());

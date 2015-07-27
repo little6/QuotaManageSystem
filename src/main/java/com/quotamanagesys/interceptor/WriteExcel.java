@@ -38,6 +38,7 @@ public class WriteExcel extends HibernateDao{
 	@Resource
 	QuotaItemViewTableManageDao quotaItemViewTableManageDao;
 	
+	//局领导指标表
 	@Expose
 	public void writeExcel(int year,int month) throws IOException, SQLException{
 		String fileName="C:\\DC_\\河池供电局X年X月关键业绩考核指标完成情况表.xls";
@@ -158,6 +159,85 @@ public class WriteExcel extends HibernateDao{
 		}
 		
 		String fileName2="C:\\DC_\\河池供电局X年X月关键业绩考核指标完成情况表.xls";
+		//String fileName2="C:\\DC_\\河池供电局"+year+"年"+month+"月关键业绩考核指标完成情况表.xlsx";
+		fileName2=URLEncoder.encode(fileName2, "UTF-8");
+		FileOutputStream fileOutputStream=new FileOutputStream(fileName);
+		workbook.write(fileOutputStream);
+		fileOutputStream.flush();
+		fileOutputStream.close();
+	}
+	
+	//办公室指标表
+	@Expose
+	public void writeExcel2(int year,int month) throws IOException, SQLException{
+		String fileName="C:\\DC_\\河池供电局XX年XX月指标完成情况（办公室关注指标）.xls";
+		InputStream fileInputStream=new FileInputStream(fileName);
+		HSSFWorkbook workbook=new HSSFWorkbook(fileInputStream);
+		
+		HSSFSheet sheet=workbook.getSheetAt(0);
+		if (sheet==null) {
+			System.out.println("sheet is null");
+		}else {
+			boolean isSuccess=true;
+			try {
+				QuotaItemViewTableManage quotaItemViewTableManage=quotaItemViewTableManageDao.getItemViewTableManageByYear(year);
+				if (quotaItemViewTableManage!=null) {
+					HSSFRow title=sheet.getRow(0);
+					title.getCell(0).setCellValue("河池供电局"+year+"年"+month+"月指标完成情况");
+
+					for (int rowNum = 2; rowNum <= sheet.getLastRowNum(); rowNum++) {
+						HSSFRow row=sheet.getRow(rowNum);
+						if (row==null) {
+							System.out.println("row is null");
+						} else {
+							String quotaName=row.getCell(1).getStringCellValue();
+							String quotaCover=row.getCell(2).getStringCellValue();
+							String sqlString="select * from "+quotaItemViewTableManage.getTableName()+" where 月度="+month
+									+" and 指标名称='"+quotaName+"' and 口径='"+quotaCover+"'";
+							
+							List resultList=getQueryResults(sqlString);
+							if (resultList.size()>0) {
+								Object result=resultList.get(0);
+								Map map=(Map) result;
+								
+								if (map.get("累计值")==null||map.get("累计值").equals("#")) {
+									row.getCell(4).setCellValue(" ");
+								} else {
+									String ljz=map.get("累计值").toString();
+									row.getCell(4).setCellValue(ljz);
+								}
+								
+								if (map.get("同比变化")==null||map.get("同比变化").equals("#")) {
+									row.getCell(5).setCellValue(" ");
+								} else {
+									String tb=map.get("同比变化").toString();
+									row.getCell(5).setCellValue(tb);
+								}
+								
+								if (map.get("内控考核")==null||map.get("内控考核").equals("#")) {
+									row.getCell(6).setCellValue(" ");
+								} else {
+									String nk=map.get("内控考核").toString();
+									row.getCell(6).setCellValue(nk);
+								}
+								
+							}else {
+								row.getCell(4).setCellValue(" ");
+								row.getCell(5).setCellValue(" ");
+								row.getCell(6).setCellValue(" ");
+							}
+						}
+					}
+				}else {
+					isSuccess=false;
+					System.out.print("无该年度数据："+year);
+				}
+			} catch (Exception e) {
+				isSuccess=false;
+			}
+		}
+		
+		String fileName2="C:\\DC_\\河池供电局XX年XX月指标完成情况（办公室关注指标）.xls";
 		//String fileName2="C:\\DC_\\河池供电局"+year+"年"+month+"月关键业绩考核指标完成情况表.xlsx";
 		fileName2=URLEncoder.encode(fileName2, "UTF-8");
 		FileOutputStream fileOutputStream=new FileOutputStream(fileName);
