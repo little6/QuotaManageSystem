@@ -22,7 +22,6 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.CellStyle;
 import org.hibernate.Session;
 import org.hibernate.transform.Transformers;
 import org.springframework.stereotype.Component;
@@ -126,7 +125,7 @@ public class WriteExcel extends HibernateDao{
 										font.setColor(color.getIndex());
 										cellStyle.setFont(font);
 										row.getCell(11).setCellStyle(cellStyle);
-										row.getCell(11).setCellValue("■■");
+										row.getCell(11).setCellValue("●");
 									} else if (gskhjk.equals("1.0")) {
 										HSSFFont font=row.getCell(11).getCellStyle().getFont(workbook);
 										HSSFPalette palette=workbook.getCustomPalette();
@@ -135,7 +134,7 @@ public class WriteExcel extends HibernateDao{
 										font.setColor(color.getIndex());
 										cellStyle.setFont(font);
 										row.getCell(11).setCellStyle(cellStyle);
-										row.getCell(11).setCellValue("■■");
+										row.getCell(11).setCellValue("●");
 									}
 								}
 							}else {
@@ -157,14 +156,17 @@ public class WriteExcel extends HibernateDao{
 				isSuccess=false;
 			}
 		}
-		
-		String fileName2="C:\\DC_\\河池供电局X年X月关键业绩考核指标完成情况表.xls";
-		//String fileName2="C:\\DC_\\河池供电局"+year+"年"+month+"月关键业绩考核指标完成情况表.xlsx";
-		fileName2=URLEncoder.encode(fileName2, "UTF-8");
+			
 		FileOutputStream fileOutputStream=new FileOutputStream(fileName);
 		workbook.write(fileOutputStream);
 		fileOutputStream.flush();
 		fileOutputStream.close();
+		
+		String fileName2="C:\\DC_\\"+URLEncoder.encode("河池供电局"+year+"年"+month+"月关键业绩考核指标完成情况表", "UTF-8")+".xls";
+		FileOutputStream fileOutputStream2=new FileOutputStream(fileName2);
+		workbook.write(fileOutputStream2);
+		fileOutputStream2.flush();
+		fileOutputStream2.close();
 	}
 	
 	//办公室指标表
@@ -237,10 +239,8 @@ public class WriteExcel extends HibernateDao{
 			}
 		}
 		
-		String fileName2="C:\\DC_\\河池供电局XX年XX月指标完成情况（办公室关注指标）.xls";
-		//String fileName2="C:\\DC_\\河池供电局"+year+"年"+month+"月关键业绩考核指标完成情况表.xlsx";
-		fileName2=URLEncoder.encode(fileName2, "UTF-8");
-		FileOutputStream fileOutputStream=new FileOutputStream(fileName);
+		String fileName2="C:\\DC_\\"+URLEncoder.encode("河池供电局"+year+"年"+month+"月指标完成情况（办公室关注指标）", "UTF-8")+".xls";
+		FileOutputStream fileOutputStream=new FileOutputStream(fileName2);
 		workbook.write(fileOutputStream);
 		fileOutputStream.flush();
 		fileOutputStream.close();

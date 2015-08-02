@@ -1,42 +1,76 @@
 @CHARSET "UTF-8";
 #scrollTable {
-  width:100%;
-  border: 1px solid #EB8;/*table没有外围的border，只有内部的td或th有border*/
-  background: #ECE9D8;
+  width: 1060px;
+  height: 95%;
+  border: 1px solid #000000;
+  background: #FFFFFF;
 }
-
 
 #scrollTable table {
-  border-collapse:collapse; /*统一设置两个table为细线表格*/
+  border-collapse: collapse;
 }
 
-#scrollTable table.thead{ /*表头*/
-  /*div的第一个子元素*/
-  width:100%;
+#scrollTable table.thead {
+  width: 100%;
 }
 
-#scrollTable table.thead th{/*表头*/
+#scrollTable table.thead th {
   border: 1px solid #EB8;
-  border-right:#C96;
-  color:#fff;
-  background: #ECE9D8;/*亮桔黄色*/
+  border-right: #000000;
+  color: #FFFFFF;
+  background: #FFFFFF;
 }
 
-#scrollTable div{/*能带滚动条的表身*/
-  /*div的第二个子元素*/
-  width:100%;
-  height:690px;
-  overflow:auto;/*必需*/
+#hd1 {
+  width: 100%;
+  height: 51px;
+  overflow: auto;
 }
 
-#scrollTable table.tbody{/*能带滚动条的表身的正体*/
-  width:100%;
-  border: 1px solid #C96;
-  border-right:#B74;
-  color:#666666;
-  background: #ECE9D8;
+#bd1 {
+  width: 100%;
+  height: 93%;
+  overflow: auto;
 }
-#scrollTable table.tbody td{/*能带滚动条的表身的格子*/
-  border:1px solid #C96;
+
+#hd1 table {
+  border-collapse: collapse;
+}
+
+#hd1 table.thead {
+  width: 100%;
+}
+
+#bd1 table {
+  border-collapse: collapse;
+}
+
+#bd1 table.thead {
+  width: 100%;
+}
+
+#hd1 table.tbody {
+  width: 100%;
+  border: 1px solid #FFFFFF;
+  border-right: #B74;
+  color: #666666;
+  background: #FFFFFF;
+}
+
+#hd1 table.tbody td {
+  border: 1px solid #FFFFFF;
+  WORD-WRAP: break-word;
+}
+
+#bd1 table.tbody {
+  width: 100%;
+  border: 1px solid #FFFFFF;
+  border-right: #B74;
+  color: #666666;
+  background: #FFFFFF;
+}
+
+#bd1 table.tbody td {
+  border: 1px solid #FFFFFF;
   WORD-WRAP: break-word;
 }

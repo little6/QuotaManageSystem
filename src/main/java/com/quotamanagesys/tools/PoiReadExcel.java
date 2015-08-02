@@ -1,17 +1,13 @@
 package com.quotamanagesys.tools;
 
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
@@ -23,8 +19,10 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.stereotype.Component;
 
+import com.bstek.bdf2.core.business.IUser;
+import com.bstek.bdf2.core.context.ContextHolder;
+import com.bstek.bdf2.core.exception.NoneLoginException;
 import com.bstek.dorado.annotation.DataProvider;
-import com.bstek.dorado.annotation.Expose;
 
 @Component
 public class PoiReadExcel {
@@ -50,14 +48,12 @@ public class PoiReadExcel {
 	 * @throws Exception
 	 */
 	
-	
 	public StringBuffer read(String fileName) throws Exception {
 		HSSFSheet sheet = null;
 		StringBuffer lsb = new StringBuffer();
 		String excelFileName = fileName;
 
-		lsb.append("<div id=\"scrollTable\">"
-				+"<div style=\"overflow-y:scroll;height:100px\">");
+		lsb.append("<div id=\"scrollTable\"><div id=\"hd1\"><table class=\"thead\"><tbody>");
 
 		try {
 			HSSFWorkbook workbook = new HSSFWorkbook(new FileInputStream(
@@ -70,9 +66,7 @@ public class PoiReadExcel {
 					if (sheet != null) {
 						int firstRowNum = sheet.getFirstRowNum(); // 第一行
 						int lastRowNum = sheet.getLastRowNum(); // 最后一行
-						// 构造Table表头
-						lsb.append("<table class=\"gridView\" id=\"table1\" width=\"100%\" style=\"border:1px solid #000;border-width:1px 0 0 1px;margin:2px 0 2px 0;border-collapse:collapse;\">");
-						lsb.append("<thead>");
+						
 						for (int rowNum = firstRowNum; rowNum <= 1; rowNum++) {
 							if (sheet.getRow(rowNum) != null) {// 如果行不为空，
 								HSSFRow row = sheet.getRow(rowNum);
@@ -81,83 +75,14 @@ public class PoiReadExcel {
 								int height = (int) (row.getHeight() / 15.625); // 行的高度
 								lsb.append("<tr height=\""
 										+ height
-										+ "\" style=\"border:1px solid #000;border-width:0 1px 1px 0;margin:2px 0 2px 0;\">");
+										+ "\" style=\"border:1px solid #000;border-width:0 1px 1px 0;margin:0 0 0 0;\">");
 								for (short cellNum = firstCellNum; cellNum <= lastCellNum; cellNum++) { // 循环该行的每一个单元格
-									HSSFCell cell = row.getCell(cellNum);
-									if (cell != null) {
-										if (cell.getCellType() == HSSFCell.CELL_TYPE_BLANK) {
-											continue;
-										} else {
-											StringBuffer tdStyle = new StringBuffer(
-													"<td style=\"border:1px solid #000; border-width:0 1px 1px 0;margin:2px 0 2px 0; ");
-											HSSFCellStyle cellStyle = cell
-													.getCellStyle();
-											HSSFPalette palette = workbook
-													.getCustomPalette(); // 类HSSFPalette用于求颜色的国际标准形式
-											HSSFColor hColor = palette
-													.getColor(cellStyle
-															.getFillForegroundColor());
-											HSSFColor hColor2 = palette
-													.getColor(cellStyle
-															.getFont(workbook)
-															.getColor());
-
-											String bgColor = convertToStardColor(hColor);// 背景颜色
-											short boldWeight = cellStyle
-													.getFont(workbook)
-													.getBoldweight(); // 字体粗细
-											short fontHeight = (short) (cellStyle
-													.getFont(workbook)
-													.getFontHeight() / 2); // 字体大小
-											String fontColor = convertToStardColor(hColor2); // 字体颜色
-											if (bgColor != null
-													&& !"".equals(bgColor
-															.trim())) {
-												tdStyle.append(" background-color:"
-														+ bgColor + "; ");
-											}
-											if (fontColor != null
-													&& !"".equals(fontColor
-															.trim())) {
-												tdStyle.append(" color:"
-														+ fontColor + "; ");
-											}
-											tdStyle.append(" font-weight:"
-													+ boldWeight + "; ");
-											tdStyle.append(" font-size: "
-													+ fontHeight + "%;");
-											lsb.append(tdStyle + "\"");
-
-											int width = (int) (sheet
-													.getColumnWidth(cellNum) / 35.7); //
-											int cellReginCol = getMergerCellRegionCol(
-													sheet, rowNum, cellNum); // 合并的列（solspan）
-											int cellReginRow = getMergerCellRegionRow(
-													sheet, rowNum, cellNum);// 合并的行（rowspan）
-											String align = convertAlignToHtml(cellStyle
-													.getAlignment()); //
-											String vAlign = convertVerticalAlignToHtml(cellStyle
-													.getVerticalAlignment());
-
-											lsb.append(" align=\"" + align
-													+ "\" valign=\"" + vAlign
-													+ "\" width=\"" + width
-													+ "\" ");
-											lsb.append(" colspan=\""
-													+ cellReginCol
-													+ "\" rowspan=\""
-													+ cellReginRow + "\"");
-											lsb.append(">" + getCellValue(cell)
-													+ "</td>");
-										}
-									}
+									lsb.append(getRowValue(row, rowNum, cellNum, workbook, sheet));
 								}
 								lsb.append("</tr>");
 							}
 						}
-						lsb.append("</thead></table></div>");
-
-						lsb.append("<div id=\"maincontent\"><table class=\"tbody\" style=\"table-layout:fixed\"><tbody>");
+						lsb.append("<tbody></table></div><div id=\"bd1\"><table class=\"tbody\" style=\"table-layout:fixed\"><tbody>");
 						for (int rowNum = firstRowNum + 2; rowNum <= lastRowNum; rowNum++) {
 							if (sheet.getRow(rowNum) != null) {// 如果行不为空，
 								HSSFRow row = sheet.getRow(rowNum);
@@ -166,83 +91,14 @@ public class PoiReadExcel {
 								int height = (int) (row.getHeight() / 15.625); // 行的高度
 								lsb.append("<tr height=\""
 										+ height
-										+ "\" style=\"border:1px solid #000;border-width:0 1px 1px 0;margin:2px 0 2px 0;\">");
+										+ "\" style=\"border:1px solid #000;border-width:0 1px 1px 0;margin:0 0 0 0;\">");
 								for (short cellNum = firstCellNum; cellNum <= lastCellNum; cellNum++) { // 循环该行的每一个单元格
-									HSSFCell cell = row.getCell(cellNum);
-									if (cell != null) {
-										if (cell.getCellType() == HSSFCell.CELL_TYPE_BLANK) {
-											continue;
-										} else {
-											StringBuffer tdStyle = new StringBuffer(
-													"<td style=\"border:1px solid #000; border-width:0 1px 1px 0;margin:2px 0 2px 0; ");
-											HSSFCellStyle cellStyle = cell
-													.getCellStyle();
-											HSSFPalette palette = workbook
-													.getCustomPalette(); // 类HSSFPalette用于求颜色的国际标准形式
-											HSSFColor hColor = palette
-													.getColor(cellStyle
-															.getFillForegroundColor());
-											HSSFColor hColor2 = palette
-													.getColor(cellStyle
-															.getFont(workbook)
-															.getColor());
-
-											String bgColor = convertToStardColor(hColor);// 背景颜色
-											short boldWeight = cellStyle
-													.getFont(workbook)
-													.getBoldweight(); // 字体粗细
-											short fontHeight = (short) (cellStyle
-													.getFont(workbook)
-													.getFontHeight() / 2); // 字体大小
-											String fontColor = convertToStardColor(hColor2); // 字体颜色
-											if (bgColor != null
-													&& !"".equals(bgColor
-															.trim())) {
-												tdStyle.append(" background-color:"
-														+ bgColor + "; ");
-											}
-											if (fontColor != null
-													&& !"".equals(fontColor
-															.trim())) {
-												tdStyle.append(" color:"
-														+ fontColor + "; ");
-											}
-											tdStyle.append(" font-weight:"
-													+ boldWeight + "; ");
-											tdStyle.append(" font-size: "
-													+ fontHeight + "%;");
-											lsb.append(tdStyle + "\"");
-
-											int width = (int) (sheet
-													.getColumnWidth(cellNum) / 35.7); //
-											int cellReginCol = getMergerCellRegionCol(
-													sheet, rowNum, cellNum); // 合并的列（solspan）
-											int cellReginRow = getMergerCellRegionRow(
-													sheet, rowNum, cellNum);// 合并的行（rowspan）
-											String align = convertAlignToHtml(cellStyle
-													.getAlignment()); //
-											String vAlign = convertVerticalAlignToHtml(cellStyle
-													.getVerticalAlignment());
-
-											lsb.append(" align=\"" + align
-													+ "\" valign=\"" + vAlign
-													+ "\" width=\"" + width
-													+ "\" ");
-											lsb.append(" colspan=\""
-													+ cellReginCol
-													+ "\" rowspan=\""
-													+ cellReginRow + "\"");
-											lsb.append(">" + getCellValue(cell)
-													+ "</td>");
-										}
-									}
+									lsb.append(getRowValue(row, rowNum, cellNum, workbook, sheet));
 								}
 								lsb.append("</tr>");
 							}
 						}
-						lsb.append("</tbody>");
-						
-						lsb.append("</table></div>");
+						lsb.append("</tbody></table></div>");
 					}
 				}
 			}
@@ -256,6 +112,81 @@ public class PoiReadExcel {
 		return lsb;
 	}
 
+	public StringBuffer getRowValue(HSSFRow row,int rowNum,int cellNum,HSSFWorkbook workbook,HSSFSheet sheet) throws Exception{
+		HSSFCell cell = row.getCell(cellNum);
+		StringBuffer lsb=new StringBuffer();
+		if (cell != null) {
+			if (cell.getCellType() == HSSFCell.CELL_TYPE_BLANK) {
+				lsb.append("");
+			} else {
+				StringBuffer tdStyle = new StringBuffer(
+						"<td style=\"border:1px solid #000; border-width:0 1px 1px 0;margin:0 0 0 0; ");
+				HSSFCellStyle cellStyle = cell
+						.getCellStyle();
+				HSSFPalette palette = workbook
+						.getCustomPalette(); // 类HSSFPalette用于求颜色的国际标准形式
+				HSSFColor hColor = palette
+						.getColor(cellStyle
+								.getFillForegroundColor());
+				HSSFColor hColor2 = palette
+						.getColor(cellStyle
+								.getFont(workbook)
+								.getColor());
+
+				String bgColor = convertToStardColor(hColor);// 背景颜色
+				short boldWeight = cellStyle
+						.getFont(workbook)
+						.getBoldweight(); // 字体粗细
+				short fontHeight = (short) (cellStyle
+						.getFont(workbook)
+						.getFontHeight() /1.8); // 字体大小
+				String fontColor = convertToStardColor(hColor2); // 字体颜色
+				if (bgColor != null
+						&& !"".equals(bgColor
+								.trim())) {
+					tdStyle.append(" background-color:"
+							+ bgColor + "; ");
+				}
+				if (fontColor != null
+						&& !"".equals(fontColor
+								.trim())) {
+					tdStyle.append(" color:"
+							+ fontColor + "; ");
+				}
+				tdStyle.append(" font-weight:"
+						+ boldWeight + "; ");
+				tdStyle.append(" font-size: "
+						+ fontHeight + "%;");
+				lsb.append(tdStyle + "\"");
+
+				int width = (int) (sheet
+						.getColumnWidth(cellNum) / 35.7); //
+				int cellReginCol = getMergerCellRegionCol(
+						sheet, rowNum, cellNum); // 合并的列（solspan）
+				int cellReginRow = getMergerCellRegionRow(
+						sheet, rowNum, cellNum);// 合并的行（rowspan）
+				String align = convertAlignToHtml(cellStyle
+						.getAlignment()); //
+				String vAlign = convertVerticalAlignToHtml(cellStyle
+						.getVerticalAlignment());
+
+				lsb.append(" align=\"" + align
+						+ "\" valign=\"" + vAlign
+						+ "\" width=\"" + width
+						+ "\" ");
+				lsb.append(" colspan=\""
+						+ cellReginCol
+						+ "\" rowspan=\""
+						+ cellReginRow + "\"");
+				lsb.append(">" + getCellValue(cell)
+						+ "</td>");
+			}
+		}else {
+			lsb.append("");
+		}
+		return lsb;
+	}
+	
 	/**
 	 * 取得单元格的值
 	 * 
@@ -289,7 +220,7 @@ public class PoiReadExcel {
 		}
 		return value;
 	}
-
+	
 	/**
 	 * 判断单元格在不在合并单元格范围内，如果是，获取其合并的列数。
 	 * 

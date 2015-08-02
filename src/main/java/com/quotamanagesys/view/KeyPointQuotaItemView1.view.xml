@@ -6,13 +6,8 @@
     <Attribute name="year"/>
   </Context>
   <Model/>
-  <View id="v1">
-    <ClientEvent name="onResize">alert(self.get(&quot;id&quot;)+&quot;:&quot;+self.get(&quot;height&quot;));&#xD;
-alert($(document).height());</ClientEvent>
+  <View>
     <Property name="visible">true</Property>
-    <Property name="contentOverflowY">visible</Property>
-    <Property name="contentOverflowX">visible</Property>
-    <Property name="contentOverflow">visible</Property>
     <Property name="styleSheetFile">/optv/optvstyle1.css</Property>
     <YearDropDown id="yddYear"/>
     <ListDropDown id="lddMonth">
@@ -77,7 +72,6 @@ alert($(document).height());</ClientEvent>
     <DownloadAction id="aaDownLoadFile">
       <Property name="fileProvider">downLoadFile#download</Property>
       <Property name="parameter"></Property>
-      <Property name="inlineMode">browser</Property>
     </DownloadAction>
     <DataSet id="dsPointQuotaViewHtml">
       <Property name="dataType">String</Property>
@@ -165,18 +159,25 @@ aaWriteExcel.execute({&#xD;
         <ClientEvent name="onClick">var teYear=view.get(&quot;#teYear&quot;);&#xD;
 var year=parseInt(teYear.get(&quot;text&quot;));&#xD;
 var teMonth=view.get(&quot;#teMonth&quot;);&#xD;
-var month=teMonth.get(&quot;text&quot;);&#xD;
-var aaDownLoadFile=view.get(&quot;#aaDownLoadFile&quot;);&#xD;
+var month=parseInt(teMonth.get(&quot;text&quot;));&#xD;
 &#xD;
-aaDownLoadFile.set(&quot;parameter&quot;,{year:year,month:month});&#xD;
-aaDownLoadFile.execute();</ClientEvent>
-        <Property name="caption">下载指标完成情况表</Property>
-        <Property name="visible">false</Property>
+var aaWriteExcel=view.get(&quot;#aaWriteExcel&quot;);&#xD;
+aaWriteExcel.set(&quot;parameter&quot;,{year:year,month:month});&#xD;
+aaWriteExcel.execute({&#xD;
+	callback : function(success, obj){&#xD;
+		if (success) {&#xD;
+			var aaDownLoadFile=view.get(&quot;#aaDownLoadFile&quot;);&#xD;
+			aaDownLoadFile.set(&quot;parameter&quot;,{year:year,month:month});&#xD;
+			aaDownLoadFile.execute();&#xD;
+        }&#xD;
+	}&#xD;
+});</ClientEvent>
+        <Property name="caption">下载</Property>
+        <Property name="visible">true</Property>
+        <Property name="icon">url(>skin>common/icons.gif) -140px -240px</Property>
       </ToolBarButton>
     </ToolBar>
     <HtmlContainer id="hc1" listener="spring:keyPointQuotaItemViewInit#Hc1Init">
-      <ClientEvent name="onDoubleClick">alert($(&quot;#scrollTable&quot;).height());&#xD;
-$(&quot;#scrollTable&quot;).css(&quot;height&quot;,$(&quot;#scrollTable&quot;).height()+&quot;px&quot;);</ClientEvent>
       <Property name="visible">true</Property>
       <Property name="hideMode">visibility</Property>
       <Property name="containerUi">default</Property>

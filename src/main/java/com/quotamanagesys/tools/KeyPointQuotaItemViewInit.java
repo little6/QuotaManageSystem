@@ -1,8 +1,12 @@
 package com.quotamanagesys.tools;
 
 import java.util.Calendar;
+
 import javax.annotation.Resource;
+
 import org.springframework.stereotype.Component;
+
+import com.bstek.bdf2.core.model.UrlComponent;
 import com.bstek.bdf2.core.orm.hibernate.HibernateDao;
 import com.bstek.dorado.view.widget.HtmlContainer;
 import com.bstek.dorado.web.DoradoContext;
@@ -20,6 +24,7 @@ public class KeyPointQuotaItemViewInit extends HibernateDao{
 		int year;
 		int month;
 		DoradoContext context = DoradoContext.getCurrent();
+		
 		if (context.getAttribute(DoradoContext.VIEW, "year")==null) {
 			Calendar calendar=Calendar.getInstance();	
 			year=calendar.get(Calendar.YEAR);
