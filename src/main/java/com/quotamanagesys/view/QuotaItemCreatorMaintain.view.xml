@@ -419,7 +419,7 @@ dsQuotaItemCreatorWithoutFormulas.flushAsync();</ClientEvent>
         </MenuButton>
         <ToolBarButton>
           <Property name="action">aaPushValueToPmis</Property>
-          <Property name="caption">ggg</Property>
+          <Property name="caption">绩效数据联通</Property>
         </ToolBarButton>
       </ToolBar>
       <SplitPanel>

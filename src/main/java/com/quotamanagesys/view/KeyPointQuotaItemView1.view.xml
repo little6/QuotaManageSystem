@@ -110,28 +110,7 @@ if(month==0){&#xD;
 }&#xD;
 self.set(&quot;text&quot;,year);&#xD;
 view.set(&quot;context.year&quot;,year);</ClientEvent>
-        <Property name="trigger">yddYear</Property>
-        <Property name="width">70</Property>
-      </TextEditor>
-      <ToolBarLabel>
-        <Property name="text">月度</Property>
-      </ToolBarLabel>
-      <TextEditor id="teMonth">
-        <ClientEvent name="onReady">var date=new Date();&#xD;
-var year;&#xD;
-var month=date.getMonth();&#xD;
-&#xD;
-if(month==0){&#xD;
-	month=12;&#xD;
-}&#xD;
-self.set(&quot;text&quot;,month);&#xD;
-view.set(&quot;context.month&quot;,month);</ClientEvent>
-        <Property name="trigger">lddMonth</Property>
-        <Property name="width">70</Property>
-      </TextEditor>
-      <Separator/>
-      <ToolBarButton>
-        <ClientEvent name="onClick">teYear=view.get(&quot;#teYear&quot;);&#xD;
+        <ClientEvent name="onPost">teYear=view.get(&quot;#teYear&quot;);&#xD;
 year=parseInt(teYear.get(&quot;text&quot;));&#xD;
 teMonth=view.get(&quot;#teMonth&quot;);&#xD;
 month=teMonth.get(&quot;text&quot;);&#xD;
@@ -152,27 +131,57 @@ aaWriteExcel.execute({&#xD;
         }&#xD;
 	}&#xD;
 });</ClientEvent>
-        <Property name="caption">查看</Property>
-        <Property name="icon">url(>skin>common/icons.gif) -220px -80px</Property>
-      </ToolBarButton>
+        <Property name="trigger">yddYear</Property>
+        <Property name="width">70</Property>
+      </TextEditor>
+      <ToolBarLabel>
+        <Property name="text">月度</Property>
+      </ToolBarLabel>
+      <TextEditor id="teMonth">
+        <ClientEvent name="onReady">var date=new Date();&#xD;
+var year;&#xD;
+var month=date.getMonth();&#xD;
+&#xD;
+if(month==0){&#xD;
+	month=12;&#xD;
+}&#xD;
+self.set(&quot;text&quot;,month);&#xD;
+view.set(&quot;context.month&quot;,month);</ClientEvent>
+        <ClientEvent name="onPost">teYear=view.get(&quot;#teYear&quot;);&#xD;
+year=parseInt(teYear.get(&quot;text&quot;));&#xD;
+teMonth=view.get(&quot;#teMonth&quot;);&#xD;
+month=teMonth.get(&quot;text&quot;);&#xD;
+dsPointQuotaViewHtml=view.get(&quot;#dsPointQuotaViewHtml&quot;);&#xD;
+hc1=view.get(&quot;#hc1&quot;);&#xD;
+aaWriteExcel=view.get(&quot;#aaWriteExcel&quot;);&#xD;
+dlgView=view.get(&quot;#dlgView&quot;);&#xD;
+&#xD;
+aaWriteExcel.set(&quot;parameter&quot;,{year:year,month:month});&#xD;
+aaWriteExcel.execute({&#xD;
+	callback : function(success, obj){&#xD;
+		if (success) {&#xD;
+			dsPointQuotaViewHtml.flush();&#xD;
+			var html=dsPointQuotaViewHtml.getData();&#xD;
+			hc1.refresh(true);&#xD;
+			hc1.set(&quot;content&quot;,html);&#xD;
+			hc1.refresh(true);&#xD;
+        }&#xD;
+	}&#xD;
+});</ClientEvent>
+        <Property name="trigger">lddMonth</Property>
+        <Property name="width">70</Property>
+      </TextEditor>
+      <Separator/>
       <ToolBarButton>
         <ClientEvent name="onClick">var teYear=view.get(&quot;#teYear&quot;);&#xD;
 var year=parseInt(teYear.get(&quot;text&quot;));&#xD;
 var teMonth=view.get(&quot;#teMonth&quot;);&#xD;
 var month=parseInt(teMonth.get(&quot;text&quot;));&#xD;
 &#xD;
-var aaWriteExcel=view.get(&quot;#aaWriteExcel&quot;);&#xD;
-aaWriteExcel.set(&quot;parameter&quot;,{year:year,month:month});&#xD;
-aaWriteExcel.execute({&#xD;
-	callback : function(success, obj){&#xD;
-		if (success) {&#xD;
-			var aaDownLoadFile=view.get(&quot;#aaDownLoadFile&quot;);&#xD;
-			aaDownLoadFile.set(&quot;parameter&quot;,{year:year,month:month});&#xD;
-			aaDownLoadFile.execute();&#xD;
-        }&#xD;
-	}&#xD;
-});</ClientEvent>
-        <Property name="caption">下载</Property>
+var aaDownLoadFile=view.get(&quot;#aaDownLoadFile&quot;);&#xD;
+aaDownLoadFile.set(&quot;parameter&quot;,{year:year,month:month});&#xD;
+aaDownLoadFile.execute();</ClientEvent>
+        <Property name="caption">导出</Property>
         <Property name="visible">true</Property>
         <Property name="icon">url(>skin>common/icons.gif) -140px -240px</Property>
       </ToolBarButton>
