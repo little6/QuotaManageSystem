@@ -4,7 +4,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
@@ -23,16 +25,40 @@ import com.bstek.bdf2.core.business.IUser;
 import com.bstek.bdf2.core.context.ContextHolder;
 import com.bstek.bdf2.core.exception.NoneLoginException;
 import com.bstek.dorado.annotation.DataProvider;
+import com.bstek.dorado.web.DoradoContext;
 
 @Component
 public class PoiReadExcel {
 
 	@DataProvider
 	public String getHtml() {
+		int year;
+		int month;
+		
+		DoradoContext context = DoradoContext.getCurrent();
+		if (context.getAttribute(DoradoContext.VIEW, "year")==null) {
+			Calendar calendar=Calendar.getInstance();	
+			year=calendar.get(Calendar.YEAR);
+		} else {
+			year=(int) context.getAttribute(DoradoContext.VIEW, "year");
+		}
+		if (context.getAttribute(DoradoContext.VIEW, "month")==null) {
+			Calendar calendar=Calendar.getInstance();	
+			//默认显示上月数据
+			month=calendar.get(Calendar.MONTH);//calendar的真实月份需要+1,因为calendar的月份从0开始
+			if (month==0) {
+				year=year-1;
+				month=12;
+			}
+		} else {
+			month=(int) context.getAttribute(DoradoContext.VIEW, "month");
+		}
+		
 		String htmlString = "";
 		try {
 			PoiReadExcel poire = new PoiReadExcel();
-			String path = "C:\\DC_\\河池供电局X年X月关键业绩考核指标完成情况表.xls";
+			String path="C:\\DC_\\"+URLEncoder.encode("河池供电局"+year+"年"+month+"月关键业绩考核指标完成情况表", "UTF-8")+".xls";
+			//String path = "C:\\DC_\\河池供电局X年X月关键业绩考核指标完成情况表.xls";
 			htmlString = poire.read(path).toString();
 		} catch (Exception e) {
 			e.printStackTrace();

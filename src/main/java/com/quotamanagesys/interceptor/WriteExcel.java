@@ -1,5 +1,6 @@
 package com.quotamanagesys.interceptor;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,11 +18,11 @@ import javax.annotation.Resource;
 
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
-import org.apache.poi.hssf.usermodel.HSSFPalette;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.hibernate.Session;
 import org.hibernate.transform.Transformers;
 import org.springframework.stereotype.Component;
@@ -114,25 +115,43 @@ public class WriteExcel extends HibernateDao{
 								}
 								
 								if (map.get(propertyName+"月度监控")==null||map.get(propertyName+"月度监控").equals("#")) {
-									row.getCell(11).setCellValue(" ");
+									HSSFCellStyle cellStyle=workbook.createCellStyle();
+									cellStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN); //下边框    
+									cellStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);//左边框    
+									cellStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);//上边框    
+									cellStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);//右边框  
+									row.getCell(11).setCellStyle(cellStyle);
+									row.getCell(11).setCellValue("");
 								} else {
 									String gskhjk=map.get(propertyName+"月度监控").toString();
 									if (gskhjk.equals("0.0")) {
-										HSSFFont font=row.getCell(11).getCellStyle().getFont(workbook);
-										HSSFPalette palette=workbook.getCustomPalette();
-										HSSFColor color=palette.findSimilarColor(255, 0, 0);
-										HSSFCellStyle cellStyle=row.getCell(11).getCellStyle();
-										font.setColor(color.getIndex());
+										HSSFFont font=workbook.createFont();
+							            font.setColor(HSSFColor.RED.index);//HSSFColor.VIOLET.index //字体颜色
+							            font.setFontHeightInPoints((short)20);
+							            font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);         //字体增粗
+							            
+							            HSSFCellStyle cellStyle=workbook.createCellStyle();
 										cellStyle.setFont(font);
+										cellStyle.setAlignment(CellStyle.ALIGN_CENTER);
+										cellStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN); //下边框    
+										cellStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);//左边框    
+										cellStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);//上边框    
+										cellStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);//右边框  
 										row.getCell(11).setCellStyle(cellStyle);
 										row.getCell(11).setCellValue("●");
 									} else if (gskhjk.equals("1.0")) {
-										HSSFFont font=row.getCell(11).getCellStyle().getFont(workbook);
-										HSSFPalette palette=workbook.getCustomPalette();
-										HSSFColor color=palette.findSimilarColor(0, 255, 0);
-										HSSFCellStyle cellStyle=row.getCell(11).getCellStyle();
-										font.setColor(color.getIndex());
+										HSSFFont font=workbook.createFont();
+							            font.setColor(HSSFColor.BRIGHT_GREEN.index);//HSSFColor.VIOLET.index //字体颜色
+							            font.setFontHeightInPoints((short)20);
+							            font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);         //字体增粗
+
+							            HSSFCellStyle cellStyle=workbook.createCellStyle();
 										cellStyle.setFont(font);
+										cellStyle.setAlignment(CellStyle.ALIGN_CENTER);
+										cellStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN); //下边框    
+										cellStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);//左边框    
+										cellStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);//上边框    
+										cellStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);//右边框  
 										row.getCell(11).setCellStyle(cellStyle);
 										row.getCell(11).setCellValue("●");
 									}
@@ -144,6 +163,14 @@ public class WriteExcel extends HibernateDao{
 								row.getCell(8).setCellValue(" ");
 								row.getCell(9).setCellValue(" ");
 								row.getCell(10).setCellValue(" ");
+								
+								HSSFCellStyle cellStyle=workbook.createCellStyle();
+								cellStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN); //下边框    
+								cellStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);//左边框    
+								cellStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);//上边框    
+								cellStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);//右边框  
+								row.getCell(11).setCellStyle(cellStyle);
+								row.getCell(11).setCellValue("");
 								row.getCell(11).setCellValue(" ");
 							}
 						}
@@ -156,13 +183,12 @@ public class WriteExcel extends HibernateDao{
 				isSuccess=false;
 			}
 		}
-			
-		FileOutputStream fileOutputStream=new FileOutputStream(fileName);
-		workbook.write(fileOutputStream);
-		fileOutputStream.flush();
-		fileOutputStream.close();
 		
 		String fileName2="C:\\DC_\\"+URLEncoder.encode("河池供电局"+year+"年"+month+"月关键业绩考核指标完成情况表", "UTF-8")+".xls";
+		File file2=new File(fileName2);
+		if (file2.exists()) {
+			file2.delete();
+		}
 		FileOutputStream fileOutputStream2=new FileOutputStream(fileName2);
 		workbook.write(fileOutputStream2);
 		fileOutputStream2.flush();
@@ -269,7 +295,7 @@ public class WriteExcel extends HibernateDao{
 		String driver = "com.mysql.jdbc.Driver";
 		String url = "jdbc:mysql://localhost:3306/quotamanagesysdb?useUnicode=true&amp;characterEncoding=UTF-8";
 		String user = "root"; 
-		String password = "abcd1234";
+		String password = "scmis@*08";
 		try { 
 			Class.forName(driver);
 			Connection conn = DriverManager.getConnection(url, user, password);

@@ -162,7 +162,7 @@ public class UserInfoImportCore extends HibernateDao {
 		String driver = "com.mysql.jdbc.Driver";
 		String url = "jdbc:mysql://localhost:3306/quotamanagesysdb?useUnicode=true&amp;characterEncoding=UTF-8";
 		String user = "root"; 
-		String password = "abcd1234";
+		String password = "scmis@*08";
 		try { 
 			Class.forName(driver);
 			Connection conn = DriverManager.getConnection(url, user, password);

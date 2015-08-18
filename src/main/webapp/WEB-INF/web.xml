@@ -42,8 +42,10 @@
 	    <servlet-name>ureportServlet</servlet-name>
 	    <servlet-class>com.bstek.ureport.servlet.UReportServlet</servlet-class>
 	</servlet>
+	
 	<servlet-mapping>
 	    <servlet-name>ureportServlet</servlet-name>
 	    <url-pattern>/ureport</url-pattern>
 	</servlet-mapping>
+	
 </web-app>

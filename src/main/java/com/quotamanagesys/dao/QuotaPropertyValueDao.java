@@ -123,6 +123,24 @@ public class QuotaPropertyValueDao extends HibernateDao {
 		}
 	}
 	
+	//获取quotaitem的指定属性年度目标值
+	@DataProvider
+	public QuotaPropertyValue getQuotaPropertyValueByQuotaItemAndPropertyName(String quotaItemId,String propertyName){
+		if (quotaItemId==null) {
+			return null;
+		} else {
+			QuotaItem quotaItem=quotaItemDao.getQuotaItem(quotaItemId);
+			String quotaItemCreatorId=quotaItem.getQuotaItemCreator().getId();
+			String hqlString="from "+QuotaPropertyValue.class.getName()+" where quotaItemCreator.id='"+quotaItemCreatorId+"' and quotaProperty.name='"+propertyName+"'";
+			List<QuotaPropertyValue> quotaPropertyValues=this.query(hqlString);
+			if (quotaPropertyValues.size()>0) {
+				return quotaPropertyValues.get(0);
+			}else {
+				return null;
+			}
+		}
+	}
+	
 	@DataResolver
 	public void saveQuotaPropertyValues(Collection<QuotaPropertyValue> quotaPropertyValues,String quotaItemCreatorId){
 		Session session=this.getSessionFactory().openSession();

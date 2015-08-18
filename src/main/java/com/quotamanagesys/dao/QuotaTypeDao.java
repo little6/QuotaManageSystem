@@ -442,19 +442,4 @@ public class QuotaTypeDao extends HibernateDao {
 			session.close();
 		}
 	}
-	
-	public Connection getDBConnection(){
-		String driver = "com.mysql.jdbc.Driver";
-		String url = "jdbc:mysql://localhost:3306/quotamanagesysdb?useUnicode=true&amp;characterEncoding=UTF-8";
-		String user = "root"; 
-		String password = "abcd1234";
-		try { 
-			Class.forName(driver);
-			Connection conn = DriverManager.getConnection(url, user, password);
-			return conn;
-	     }catch(Exception e){
-	    	System.out.print(e.toString());
-	    	return null;
-	     }
-	}
 }

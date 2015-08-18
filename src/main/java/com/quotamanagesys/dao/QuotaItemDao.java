@@ -39,6 +39,7 @@ import com.quotamanagesys.model.LightItem;
 import com.quotamanagesys.model.QuotaFormulaResult;
 import com.quotamanagesys.model.QuotaFormulaResultValue;
 import com.quotamanagesys.model.QuotaItem;
+import com.quotamanagesys.model.QuotaItemCreator;
 import com.quotamanagesys.model.QuotaLevel;
 import com.quotamanagesys.model.QuotaTargetValue;
 import com.quotamanagesys.tools.CriteriaConvertCore;
@@ -736,25 +737,40 @@ public class QuotaItemDao extends HibernateDao {
 		}
 	}
 	
-	//清除考核频率不正确的具体指标（按归口管理部门）
+	//清除考核频率不正确的具体指标
 	@Expose
-	public void deleteQuotaItemsWithWrongRateByManageDept(String manageDeptId){
-		Session session = this.getSessionFactory().openSession();
-		try {
-			String hqlString="from "+QuotaItem.class.getName()+" where (quotaItemCreator.quotaType.rate='年'"
-					+" and quotaItemCreator.quotaType.manageDept.id='"+manageDeptId+"'"
-					+" and month<>0)"
-					+" or (quotaItemCreator.quotaType.rate='月'"
-					+" and quotaItemCreator.quotaType.manageDept.id='"+manageDeptId+"'"
-					+" and month=0)";
-			Collection<QuotaItem> wrongRateItems=this.query(hqlString);
-			deleteQuotaItems(wrongRateItems);
-		} catch (Exception e) {
-			System.out.print(e.toString());
-		} finally {
-			session.flush();
-			session.close();
+	public void deleteQuotaItemsWithWrongRateByQuotaItemCreators(Collection<QuotaItemCreator> quotaItemCreators){
+		for (QuotaItemCreator quotaItemCreator : quotaItemCreators) {
+			deleteQuotaItemsWithWrongRateByQuotaItemCreator(quotaItemCreator.getId());
 		}
+	}
+	
+	//清除考核频率不正确的具体指标
+	@Expose
+	public void deleteQuotaItemsWithWrongRateByQuotaItemCreator(String quotaItemCreatorId){
+		Collection<QuotaItem> quotaItems=getQuotaItemsByQuotaItemCreator(quotaItemCreatorId);
+		deleteQuotaItemsWithWrongRate(quotaItems);
+	}
+	
+	//清除考核频率不正确的具体指标
+	@Expose
+	public void deleteQuotaItemsWithWrongRate(Collection<QuotaItem> quotaItems){
+		for (QuotaItem quotaItem : quotaItems) {
+			deleteQuotaItemWithWrongRate(quotaItem.getId());
+		}
+	}
+	
+	//清除考核频率不正确的具体指标
+	@Expose
+	public void deleteQuotaItemWithWrongRate(String quotaItemId){
+		String hqlString="from "+QuotaItem.class.getName()+" where (quotaItemCreator.quotaType.rate='年'"
+				+" and id='"+quotaItemId+"'"
+				+" and month<>0)"
+				+" or (quotaItemCreator.quotaType.rate='月'"
+				+" and id='"+quotaItemId+"'"
+				+" and month=0)";
+		Collection<QuotaItem> wrongRateItems=this.query(hqlString);
+		deleteQuotaItems(wrongRateItems);
 	}
 	
 	//清除未关联目标值的具体指标（全部）

@@ -1,5 +1,10 @@
 package com.quotamanagesys.dao;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -189,6 +194,23 @@ public class QuotaTypeFormulaLinkDao extends HibernateDao {
 						session.save(quotaTypeFormulaLink);
 						session.flush();
 						session.clear();
+					}else {
+						for (QuotaTypeFormulaLink quotaTypeFormulaLink : linkedTypeFormulaLinks) {
+							quotaTypeFormulaLink.setQuotaFormula(null);
+							quotaTypeFormulaLink.setQuotaType(null);
+							quotaTypeFormulaLink.setFormulaParameters(null);
+							session.delete(quotaTypeFormulaLink);
+							session.flush();
+							session.clear();
+							
+							QuotaTypeFormulaLink newQuotaTypeFormulaLink=new QuotaTypeFormulaLink();
+							newQuotaTypeFormulaLink.setQuotaType(quotaType);
+							QuotaFormula thisQuotaFormula=quotaFormulaDao.getQuotaFormula(quotaFormula.getId());
+							newQuotaTypeFormulaLink.setQuotaFormula(thisQuotaFormula);
+							session.save(newQuotaTypeFormulaLink);
+							session.flush();
+							session.clear();
+						}
 					}
 				}else if (state.equals(EntityState.DELETED)) {
 					Collection<QuotaTypeFormulaLink> quotaTypeFormulaLinks=getQuotaTypeFormulaLinksByQuotaType(quotaTypeId);

@@ -508,6 +508,7 @@ public class QuotaItemCreatorDao extends HibernateDao {
 					default:
 						break;
 					}
+					resultTableCreator.createOrUpdateResultTable(quotaItemDao.getQuotaItemsByQuotaItemCreator(quotaItemCreator.getId()));
 				}
 			}
 		} catch (Exception e) {
@@ -652,23 +653,9 @@ public class QuotaItemCreatorDao extends HibernateDao {
 							session.flush();
 							session.clear();
 							
-							//QuotaItem设置year为当前年度
+							//清除原先关联的quotaItems
 							Collection<QuotaItem> quotaItems=quotaItemDao.getQuotaItemsByQuotaItemCreator(quotaItemCreator.getId());
-							for (QuotaItem quotaItem : quotaItems) {
-								quotaItem.setYear(year);
-								quotaItem.setFinishValue(null);
-								quotaItem.setAccumulateValue(null);
-								quotaItem.setSameTermValue(null);
-								quotaItem.setSameTermAccumulateValue(null);
-								quotaItem.setFirstSubmitTime(null);
-								quotaItem.setLastSubmitTime(null);
-								quotaItem.setRedLightReason(null);
-								quotaItem.setOverTime(false);
-								quotaItem.setAllowSubmit(false);
-								session.merge(quotaItem);
-								session.flush();
-								session.clear();
-							}
+							quotaItemDao.deleteQuotaItems(quotaItems);
 						}
 					} catch (Exception e) {
 						System.out.print(e.toString());

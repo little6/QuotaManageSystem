@@ -8,9 +8,7 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.hibernate.Session;
-import org.nfunk.jep.ASTFunNode;
 import org.nfunk.jep.JEP;
-import org.nfunk.jep.type.Complex;
 import org.springframework.stereotype.Component;
 
 import com.bstek.bdf2.core.orm.hibernate.HibernateDao;
@@ -26,7 +24,6 @@ import com.quotamanagesys.model.QuotaItemCreator;
 import com.quotamanagesys.model.QuotaPropertyValue;
 import com.quotamanagesys.model.QuotaTargetValue;
 import com.quotamanagesys.model.QuotaType;
-import com.sun.org.apache.bcel.internal.generic.NEW;
 
 @Component
 public class CalculateCore extends HibernateDao{
@@ -60,12 +57,13 @@ public class CalculateCore extends HibernateDao{
 	
 	//对具体指标进行计算
 	public void calculateQuotaItemResultValue(QuotaItem quotaItem){
-		QuotaItemCreator quotaItemCreator=quotaItem.getQuotaItemCreator();
+		QuotaItem thisQuotaItem=quotaItemDao.getQuotaItem(quotaItem.getId());
+		QuotaItemCreator quotaItemCreator=quotaItemDao.getQuotaItem(thisQuotaItem.getId()).getQuotaItemCreator();
 		QuotaType quotaType=quotaItemCreator.getQuotaType();
 		int digit=quotaType.getDigit();
 		
 		Set<QuotaFormula> quotaFormulas=quotaItemCreator.getQuotaFormulas();
-		Collection<CalculateParameter> calculateParameters=getCalculateParametersByQuotaItem(quotaItem.getId());
+		Collection<CalculateParameter> calculateParameters=getCalculateParametersByQuotaItem(thisQuotaItem.getId());
 
 		Session session=this.getSessionFactory().openSession();
 		try {
@@ -84,26 +82,26 @@ public class CalculateCore extends HibernateDao{
 						try {
 							double value=jep.getValue();
 							quotaFormulaResultValue.setQuotaFormulaResult(quotaFormula.getQuotaFormulaResult());
-							quotaFormulaResultValue.setQuotaItem(quotaItem);
+							quotaFormulaResultValue.setQuotaItem(thisQuotaItem);
 							quotaFormulaResultValue.setValue(new BigDecimal(value).setScale(digit, BigDecimal.ROUND_HALF_UP).doubleValue()+"");
 						} catch (Exception e) {
 							isCalculateWrong=true;
 						}
 						
 						if (isCalculateWrong!=true) {
-							session.save(quotaFormulaResultValue);
+							session.merge(quotaFormulaResultValue);
 							session.flush();
 							session.clear();
 						}else{
-							System.out.print("quotaItemId："+quotaItem.getId()+" 计算有误 "+'\n');
+							System.out.print("quotaItemId："+thisQuotaItem.getId()+" 计算有误 "+'\n');
 							quotaFormulaResultValue.setValue("~");
-							session.save(quotaFormulaResultValue);
+							session.merge(quotaFormulaResultValue);
 							session.flush();
 							session.clear();
 						}
 					}
 				}else {
-					System.out.print("quotaItemId："+quotaItem.getId()+" 无参数参与计算 "+'\n');
+					System.out.print("quotaItemId："+thisQuotaItem.getId()+" 无参数参与计算 "+'\n');
 				}	
 			}
 		} catch (Exception e) {

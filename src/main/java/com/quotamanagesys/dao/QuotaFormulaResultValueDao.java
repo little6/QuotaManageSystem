@@ -11,17 +11,14 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.nfunk.jep.JEP;
 import org.springframework.stereotype.Component;
 
 import com.bstek.bdf2.core.orm.hibernate.HibernateDao;
 import com.bstek.dorado.annotation.DataProvider;
 import com.bstek.dorado.annotation.DataResolver;
-import com.bstek.dorado.annotation.Expose;
 import com.bstek.dorado.data.entity.EntityState;
 import com.bstek.dorado.data.entity.EntityUtils;
 import com.quotamanagesys.model.LightItem;
-import com.quotamanagesys.model.QuotaFormulaResult;
 import com.quotamanagesys.model.QuotaFormulaResultValue;
 
 @Component

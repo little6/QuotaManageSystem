@@ -176,27 +176,11 @@ public class QuotaTargetValueDao extends HibernateDao {
 	public void deleteQuotaTargetValues(Collection<QuotaTargetValue> quotaTargetValues){
 		Session session=this.getSessionFactory().openSession();
 		try {
-			ArrayList<QuotaItem> updateQuotaItems=new ArrayList<QuotaItem>();
-			
 			for (QuotaTargetValue quotaTargetValue : quotaTargetValues) {
-				QuotaItem thisQuotaItem=quotaItemDao.getQuotaItem(quotaTargetValue.getQuotaItem().getId());
 				quotaTargetValue.setQuotaItem(null);
 				quotaTargetValue.setQuotaProperty(null);
 				session.delete(quotaTargetValue);
-				updateQuotaItems.add(thisQuotaItem);
 			}
-			
-			for ( int i = 0 ; i < updateQuotaItems.size() - 1 ; i ++ ) {  
-			    for ( int j = updateQuotaItems.size() - 1 ; j > i; j -- ) {  
-			      if (updateQuotaItems.get(j).getId().equals(updateQuotaItems.get(i).getId())) {  
-			    	  updateQuotaItems.remove(j);  
-			      }   
-			    }   
-			}
-			
-			calculateCore.calculate(updateQuotaItems);
-			quotaItemDao.setAllowSubmitStatus(updateQuotaItems);
-			resultTableCreator.createOrUpdateResultTable(updateQuotaItems);
 		} catch (Exception e) {
 			System.out.print(e.toString());
 		}finally{
@@ -280,10 +264,9 @@ public class QuotaTargetValueDao extends HibernateDao {
 		}	
 	}
 	
-	//修复指标管理部门所有月度目标值
+	//修复指标月度目标值
 	@Expose
-	public void repairQuotaTargetValuesByManageDept(String manageDeptId) throws Exception{
-		Collection<QuotaItemCreator> quotaItemCreators=quotaItemCreatorDao.getQuotaItemCreatorsByManageDept(manageDeptId);
+	public void repairQuotaTargetValuesByQuotaItemCreators(Collection<QuotaItemCreator> quotaItemCreators) throws Exception{
 		for (QuotaItemCreator quotaItemCreator : quotaItemCreators) {
 			repairQuotaTargetValues(quotaItemCreator.getId());
 		}

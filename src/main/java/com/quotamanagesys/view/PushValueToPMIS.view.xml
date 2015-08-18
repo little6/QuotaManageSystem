@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ViewConfig>
+  <Arguments/>
+  <Context/>
+  <Model>
+    <DataType name="dataType1"/>
+    <DataProvider name="dataProvider1" type="direct"/>
+  </Model>
+  <View>
+    <Container>
+      <ToolBar>
+        <ToolBarButton>
+          <Property name="action">aaPushValueToPmis</Property>
+          <Property name="caption">绩效数据联通</Property>
+        </ToolBarButton>
+      </ToolBar>
+      <AjaxAction id="aaPushValueToPmis">
+        <Property name="service">pushValueToPmis#pushValues</Property>
+      </AjaxAction>
+    </Container>
+  </View>
+</ViewConfig>

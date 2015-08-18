@@ -3,7 +3,7 @@
   <Arguments/>
   <Context/>
   <Model>
-    <DataType name="QuotaItemCreator">
+    <DataType name="QuotaItemCreator" meta="x:1125;y:285">
       <Property name="creationType">com.quotamanagesys.model.QuotaItemCreator</Property>
       <PropertyDef name="id">
         <Property name="dataType">String</Property>
@@ -29,7 +29,7 @@
         <Property name="required">true</Property>
       </PropertyDef>
     </DataType>
-    <DataType name="QuotaType">
+    <DataType name="QuotaType" meta="x:615;y:238">
       <Property name="creationType">com.quotamanagesys.model.QuotaType</Property>
       <Property name="defaultDisplayProperty">name</Property>
       <PropertyDef name="id">
@@ -69,7 +69,7 @@
         <Property name="dataType">String</Property>
       </PropertyDef>
     </DataType>
-    <DataType name="QuotaProfession">
+    <DataType name="QuotaProfession" meta="x:420;y:378">
       <Property name="creationType">com.quotamanagesys.model.QuotaProfession</Property>
       <Property name="defaultDisplayProperty">name</Property>
       <PropertyDef name="id">
@@ -79,7 +79,7 @@
         <Property name="dataType">String</Property>
       </PropertyDef>
     </DataType>
-    <DataType name="QuotaUnit">
+    <DataType name="QuotaUnit" meta="x:900;y:62">
       <Property name="creationType">com.quotamanagesys.model.QuotaUnit</Property>
       <Property name="defaultDisplayProperty">name</Property>
       <PropertyDef name="id">
@@ -89,7 +89,7 @@
         <Property name="dataType">String</Property>
       </PropertyDef>
     </DataType>
-    <DataType name="QuotaLevel">
+    <DataType name="QuotaLevel" meta="x:120;y:172">
       <Property name="creationType">com.quotamanagesys.model.QuotaLevel</Property>
       <Property name="defaultDisplayProperty">name</Property>
       <PropertyDef name="id">
@@ -102,7 +102,7 @@
         <Property name="dataType">int</Property>
       </PropertyDef>
     </DataType>
-    <DataType name="QuotaDimension">
+    <DataType name="QuotaDimension" meta="x:645;y:600">
       <Property name="creationType">com.quotamanagesys.model.QuotaDimension</Property>
       <Property name="defaultDisplayProperty">name</Property>
       <PropertyDef name="id">
@@ -112,7 +112,7 @@
         <Property name="dataType">String</Property>
       </PropertyDef>
     </DataType>
-    <DataType name="Department">
+    <DataType name="Department" meta="x:570;y:8">
       <Property name="creationType">com.bstek.bdf2.core.model.DefaultDept</Property>
       <Property name="defaultDisplayProperty">name</Property>
       <PropertyDef name="id">
@@ -134,7 +134,7 @@
         <Property name="dataType">String</Property>
       </PropertyDef>
     </DataType>
-    <DataType name="QuotaProperty">
+    <DataType name="QuotaProperty" meta="x:990;y:495">
       <Property name="creationType">com.quotamanagesys.model.QuotaProperty</Property>
       <Property name="defaultDisplayProperty">name</Property>
       <PropertyDef name="id">
@@ -150,7 +150,7 @@
         <Property name="dataType">String</Property>
       </PropertyDef>
     </DataType>
-    <DataType name="QuotaPropertyValue">
+    <DataType name="QuotaPropertyValue" meta="x:285;y:570">
       <Property name="creationType">com.quotamanagesys.model.QuotaPropertyValue</Property>
       <PropertyDef name="id">
         <Property name="dataType">String</Property>
@@ -166,14 +166,14 @@
         <Property name="dataType">double</Property>
       </PropertyDef>
     </DataType>
-    <DataType name="QuotaCover" parent="global:QuotaCover">
+    <DataType name="QuotaCover" parent="global:QuotaCover" meta="x:120;y:360">
       <Reference name="childrenQuotaCovers">
         <Property name="dataType">[SELF]</Property>
         <Property name="parameter">$${this.id}</Property>
         <Property name="dataProvider">quotaCoverDao#getQuotaCoversByFatherCover</Property>
       </Reference>
     </DataType>
-    <DataType name="QuotaFormula">
+    <DataType name="QuotaFormula" meta="x:915;y:184">
       <Property name="creationType">com.quotamanagesys.model.QuotaFormula</Property>
       <PropertyDef name="id">
         <Property name="dataType">String</Property>
@@ -191,7 +191,7 @@
         <Property name="dataType">String</Property>
       </PropertyDef>
     </DataType>
-    <DataType name="QuotaFormulaResult">
+    <DataType name="QuotaFormulaResult" meta="x:330;y:120">
       <Property name="creationType">com.quotamanagesys.model.QuotaFormulaResult</Property>
       <Property name="defaultDisplayProperty">name</Property>
       <PropertyDef name="id">
@@ -417,10 +417,6 @@ dsQuotaItemCreatorWithoutFormulas.flushAsync();</ClientEvent>
             <Property name="icon">url(>skin>common/icons.gif) -220px -80px</Property>
           </MenuItem>
         </MenuButton>
-        <ToolBarButton>
-          <Property name="action">aaPushValueToPmis</Property>
-          <Property name="caption">绩效数据联通</Property>
-        </ToolBarButton>
       </ToolBar>
       <SplitPanel>
         <Property name="position">140</Property>
@@ -573,11 +569,26 @@ dsQuotaFormula3.flushAsync();</ClientEvent>
                       <ClientEvent name="onClick">var dtrDepartment=view.get(&quot;#dtrDepartment&quot;);&#xD;
 var currentDepartment=dtrDepartment.get(&quot;currentEntity&quot;);&#xD;
 var manageDeptId=currentDepartment.get(&quot;id&quot;);&#xD;
-var aaRepairDeptTargetValues=view.get(&quot;#aaRepairDeptTargetValues&quot;);&#xD;
+var aaRepairTargetValuesBySelection=view.get(&quot;#aaRepairTargetValuesBySelection&quot;);&#xD;
 &#xD;
-aaRepairDeptTargetValues.set(&quot;parameter&quot;,{manageDeptId:manageDeptId});&#xD;
-aaRepairDeptTargetValues.execute();</ClientEvent>
-                      <Property name="caption">纠正具体指标的月度目标值关联</Property>
+var dgQuotaItemCreator=view.get(&quot;#dgQuotaItemCreator&quot;);&#xD;
+var selection=dgQuotaItemCreator.get(&quot;selection&quot;);&#xD;
+&#xD;
+if (selection &amp;&amp; selection.length){&#xD;
+	aaRepairTargetValuesBySelection.set(&quot;parameter&quot;,{quotaItemCreators:selection});&#xD;
+	aaRepairTargetValuesBySelection.execute({&#xD;
+	callback : function(success, obj){&#xD;
+		if (success) {&#xD;
+			&#xD;
+        }&#xD;
+		else{}}&#xD;
+	});&#xD;
+}&#xD;
+else {&#xD;
+	message = &quot;未选中指标初始化记录！&quot;;&#xD;
+	dorado.MessageBox.alert(message);&#xD;
+}</ClientEvent>
+                      <Property name="caption">纠正指标月度目标值关联</Property>
                       <Property name="icon">url(>skin>common/icons.gif) -60px -20px</Property>
                     </MenuItem>
                     <MenuItem>
@@ -586,8 +597,23 @@ var currentDepartment=dtrDepartment.get(&quot;currentEntity&quot;);&#xD;
 var manageDeptId=currentDepartment.get(&quot;id&quot;);&#xD;
 var aaClearQuotaItemsWithWrongRate=view.get(&quot;#aaClearQuotaItemsWithWrongRate&quot;);&#xD;
 &#xD;
-aaClearQuotaItemsWithWrongRate.set(&quot;parameter&quot;,{manageDeptId:manageDeptId});&#xD;
-aaClearQuotaItemsWithWrongRate.execute();</ClientEvent>
+var dgQuotaItemCreator=view.get(&quot;#dgQuotaItemCreator&quot;);&#xD;
+var selection=dgQuotaItemCreator.get(&quot;selection&quot;);&#xD;
+&#xD;
+if (selection &amp;&amp; selection.length){&#xD;
+	aaClearQuotaItemsWithWrongRate.set(&quot;parameter&quot;,{quotaItemCreators:selection});&#xD;
+	aaClearQuotaItemsWithWrongRate.execute({&#xD;
+	callback : function(success, obj){&#xD;
+		if (success) {&#xD;
+			&#xD;
+        }&#xD;
+		else{}}&#xD;
+	});&#xD;
+}&#xD;
+else {&#xD;
+	message = &quot;未选中指标初始化记录！&quot;;&#xD;
+	dorado.MessageBox.alert(message);&#xD;
+}</ClientEvent>
                       <Property name="caption">清除考核频率不正确的具体指标</Property>
                       <Property name="icon">url(>skin>common/icons.gif) -60px -20px</Property>
                     </MenuItem>
@@ -2609,13 +2635,8 @@ dsQuotaProperty.set(&quot;parameter&quot;,{quotaItemCreatorId:null}).flushAsync(
         <Property name="successMessage">关联计算公式完成！</Property>
         <Property name="executingMessage">正在关联计算公式...</Property>
       </AjaxAction>
-      <AjaxAction id="aaRepairDeptTargetValues">
-        <Property name="service">quotaTargetValueDao#repairQuotaTargetValuesByManageDept</Property>
-        <Property name="successMessage">修复成功！</Property>
-        <Property name="executingMessage">正在修复...</Property>
-      </AjaxAction>
       <AjaxAction id="aaClearQuotaItemsWithWrongRate">
-        <Property name="service">quotaItemDao#deleteQuotaItemsWithWrongRateByManageDept</Property>
+        <Property name="service">quotaItemDao#deleteQuotaItemsWithWrongRateByQuotaItemCreators</Property>
       </AjaxAction>
       <AjaxAction id="aaRepairQuotaItemCreatorsNames">
         <Property name="service">quotaItemCreatorDao#repairQuotaItemCreatorsNames</Property>
@@ -2625,8 +2646,10 @@ dsQuotaProperty.set(&quot;parameter&quot;,{quotaItemCreatorId:null}).flushAsync(
         <Property name="successMessage">纠正责任部门完成！</Property>
         <Property name="executingMessage">纠正责任部门...</Property>
       </AjaxAction>
-      <AjaxAction id="aaPushValueToPmis">
-        <Property name="service">pushValueToPmis#pushFinishValue</Property>
+      <AjaxAction id="aaRepairTargetValuesBySelection">
+        <Property name="service">quotaTargetValueDao#repairQuotaTargetValuesByQuotaItemCreators</Property>
+        <Property name="successMessage">修复成功！</Property>
+        <Property name="executingMessage">正在修复...</Property>
       </AjaxAction>
     </Container>
   </View>

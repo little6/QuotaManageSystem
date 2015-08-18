@@ -14,16 +14,20 @@ import org.springframework.stereotype.Component;
 import com.bstek.bdf2.core.orm.hibernate.HibernateDao;
 import com.bstek.dorado.annotation.Expose;
 import com.quotamanagesys.dao.QuotaItemDao;
+import com.quotamanagesys.dao.QuotaPropertyValueDao;
 import com.quotamanagesys.model.QuotaItem;
+import com.quotamanagesys.model.QuotaPropertyValue;
 
 @Component
 public class PushValueToPmis extends HibernateDao{
 
 	@Resource
 	QuotaItemDao quotaItemDao;
+	@Resource
+	QuotaPropertyValueDao quotaPropertyValueDao;
 	
 	@Expose
-	public void pushFinishValue() throws SQLException{
+	public void pushValues() throws SQLException{
 		Connection conn=getDBConnection();
 		ResultSet rs=null;
 		boolean isSuccess=true;
@@ -40,29 +44,52 @@ public class PushValueToPmis extends HibernateDao{
 				String coverName=rs.getString("指标口径");
 				int year=Integer.parseInt(rs.getString("考核年度"));
 				int month=Integer.parseInt(rs.getString("考核月度"));
+				String propertyName=rs.getString("指标属性");
 				String updateString="";
 				
-				QuotaItem quotaItem=quotaItemDao.getQuotaItemByNameAndYearAndMonthAndCover(name, year, month, coverName);
+				QuotaItem quotaItem=quotaItemDao.getQuotaItemByNameAndYearAndMonthAndCover(name, year, month, coverName);	
+				
+				String whereString=" WHERE 指标名称='"+rs.getString("指标名称")+"'"
+						+" and 指标口径='"+rs.getString("指标口径")+"'"
+						+" and 考核年度='"+rs.getString("考核年度")+"'"
+						+" and 考核月度='"+rs.getString("考核月度")+"'";
+				
+				String importStatusString="";
+				String finishValueString="";
+				String quotaPropertyValueString="";
+				
 				if (quotaItem!=null) {
-					if (quotaItem.getFinishValue()==null) {
-						updateString="UPDATE push_value_to_pmis SET 完成值=NULL,导入情况监控='完成值为空，请核查指标完成值填写情况'"
-								+" WHERE 指标名称='"+rs.getString("指标名称")+"'"
-								+" and 指标口径='"+rs.getString("指标口径")+"'"
-								+" and 考核年度='"+rs.getString("考核年度")+"'"
-								+" and 考核月度='"+rs.getString("考核月度")+"'";
-					}else {
-						updateString="UPDATE push_value_to_pmis SET 完成值='"+quotaItem.getFinishValue()+"',导入情况监控='正常'"
-								+" WHERE 指标名称='"+rs.getString("指标名称")+"'"
-								+" and 指标口径='"+rs.getString("指标口径")+"'"
-								+" and 考核年度='"+rs.getString("考核年度")+"'"
-								+" and 考核月度='"+rs.getString("考核月度")+"'";
-					}	 
+					QuotaPropertyValue quotaPropertyValue=quotaPropertyValueDao.getQuotaPropertyValueByQuotaItemAndPropertyName(quotaItem.getId(),propertyName);
+					if (quotaPropertyValue==null) {
+						if (quotaItem.getFinishValue()==null) {
+							importStatusString="'1、完成值为空，请核查指标完成值填写情况   2、年度目标值不存在，请检查指标属性设置'";
+							finishValueString="NULL";
+							quotaPropertyValueString="NULL";
+							
+						}else {
+							importStatusString="'1、年度目标值不存在，请检查指标属性设置'";
+							finishValueString="'"+quotaItem.getFinishValue()+"'";
+							quotaPropertyValueString="NULL";
+						}	 
+					} else {
+						if (quotaItem.getFinishValue()==null) {
+							importStatusString="'1、完成值为空，请核查指标完成值填写情况'";
+							finishValueString="NULL";
+							quotaPropertyValueString="'"+quotaPropertyValue.getValue()+"'";
+							
+						}else {
+							importStatusString="'正常'";
+							finishValueString="'"+quotaItem.getFinishValue()+"'";
+							quotaPropertyValueString="'"+quotaPropertyValue.getValue()+"'";
+						}	 
+					}
+
+					updateString="UPDATE push_value_to_pmis SET 完成值="+finishValueString+",年度目标值="+quotaPropertyValueString+",导入情况监控="+importStatusString
+							+whereString;
 				}else {
-					updateString="UPDATE push_value_to_pmis SET 导入情况监控='无匹配指标，请核查'"
-							+" WHERE 指标名称='"+rs.getString("指标名称")+"'"
-							+" and 指标口径='"+rs.getString("指标口径")+"'"
-							+" and 考核年度='"+rs.getString("考核年度")+"'"
-							+" and 考核月度='"+rs.getString("考核月度")+"'";
+					importStatusString="无匹配指标，请核查";
+					updateString="UPDATE push_value_to_pmis SET 导入情况监控='"+importStatusString+"'"
+							+whereString;
 				}
 				
 				try {
@@ -74,16 +101,6 @@ public class PushValueToPmis extends HibernateDao{
 		}
 		rs.close();
 		conn.close();
-	}
-	
-	@Expose
-	public void pushStandardValue(){
-		
-	}
-	
-	@Expose
-	public void pushWeight(){
-		
 	}
 	
 	public void excuteSQL(String SQL) {
@@ -108,7 +125,7 @@ public class PushValueToPmis extends HibernateDao{
 		String driver = "com.mysql.jdbc.Driver";
 		String url = "jdbc:mysql://localhost:3306/quotamanagesysdb?useUnicode=true&amp;characterEncoding=UTF-8";
 		String user = "root"; 
-		String password = "abcd1234";
+		String password = "scmis@*08";
 		try { 
 			Class.forName(driver);
 			Connection conn = DriverManager.getConnection(url, user, password);

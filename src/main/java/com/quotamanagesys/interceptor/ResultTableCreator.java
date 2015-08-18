@@ -97,35 +97,29 @@ public class ResultTableCreator extends HibernateDao{
 					System.out.println("quotaId is null"+'\n');
 				}		
 			}
-	
+			
 			for (QuotaItem quotaItem : quotaItems) {
-				boolean isDoUpdate=false;
 				for (String quotaItemId : quotaItemIds) {
 					if ((quotaItem.getId()).equals(quotaItemId)) {
-						isDoUpdate=true;
-						String updateString=getUpdateQuotaItemValuesToTableString(quotaItem, tableName);
-						try {
-							excuteSQL(updateString);
-						} catch (Exception e) {
-							System.out.println(e.toString());
-						}
+						Collection<QuotaItem> deleteItems=new ArrayList<QuotaItem>();
+						deleteItems.add(quotaItem);
+						deleteItemsFromResultTable(deleteItems);
 						quotaItemIds.remove(quotaItemId);
 						break;
 					}else {
 						continue;
 					}
 				}
-				if (isDoUpdate==false) {
-					String insertSqlString=getInsertQuotaItemValuesIntoTableString(quotaItem,tableName);
-					if (insertSqlString!=null) {
-						try {
-							excuteSQL(insertSqlString);
-						} catch (Exception e) {
-							System.out.println(e.toString());
-						}
-					} else {
-						System.out.println(quotaItem.getId()+'\n');
-					}	
+
+				String insertSqlString=getInsertQuotaItemValuesIntoTableString(quotaItem,tableName);
+				if (insertSqlString!=null) {
+					try {
+						excuteSQL(insertSqlString);
+					} catch (Exception e) {
+						System.out.println(e.toString());
+					}
+				} else {
+					System.out.println(quotaItem.getId()+'\n');
 				}
 			}	
 		}else {
@@ -176,114 +170,6 @@ public class ResultTableCreator extends HibernateDao{
 			System.out.println("数据表不存在，无需执行删除操作");
 		}
 		conn.close();
-	}
-	
-	public String getUpdateQuotaItemValuesToTableString(QuotaItem quotaItem,String tableName){
-		//更新完成值、累计值、去年同期值
-		String firstSubmitTime="";
-		if (quotaItem.getFirstSubmitTime()!=null) { 
-			firstSubmitTime=(quotaItem.getFirstSubmitTime().getYear()+1900)+"-"
-					+(quotaItem.getFirstSubmitTime().getMonth()+1)+"-"
-					+quotaItem.getFirstSubmitTime().getDate();
-		}
-		String lastSubmitTime="";
-		if (quotaItem.getLastSubmitTime()!=null) {
-			lastSubmitTime=(quotaItem.getLastSubmitTime().getYear()+1900)+"-"
-					+(quotaItem.getLastSubmitTime().getMonth()+1)+"-"
-					+quotaItem.getLastSubmitTime().getDate();
-		}
-		String usernameOfLastSubmit="";
-		if (quotaItem.getUsernameOfLastSubmit()!=null) {
-			usernameOfLastSubmit=quotaItem.getUsernameOfLastSubmit();
-		}
-		String redLightReason="";
-		if (quotaItem.getRedLightReason()!=null) {
-			redLightReason=quotaItem.getRedLightReason();
-		}
-		
-		String staticSetString;
-		QuotaItemCreator quotaItemCreator=quotaItem.getQuotaItemCreator();
-		QuotaType quotaType=quotaItemCreator.getQuotaType();
-		
-		if (quotaItem.isAllowSubmit()==false) {
-			staticSetString="指标名称='"+quotaType.getName()+"'"
-					+ ",指标专业='"+quotaType.getQuotaProfession().getName()+"'"
-					+ ",指标级别='"+quotaType.getQuotaLevel().getName()+"'"
-					+ ",计量单位='"+quotaType.getQuotaUnit().getName()+"'"
-					+ ",小数位数="+quotaType.getDigit()
-					+ ",管理部门id='"+quotaType.getManageDept().getId()+"'"
-					+ ",管理部门='"+quotaType.getManageDept().getName()+"'"
-					+ ",责任部门id='"+quotaItemCreator.getQuotaDutyDept().getId()+"'"
-					+ ",责任部门='"+quotaItemCreator.getQuotaDutyDept().getName()+"'"
-					+ ",口径id='"+quotaItemCreator.getQuotaCover().getId()+"'"
-					+ ",口径='"+quotaItemCreator.getQuotaCover().getName()+"'"
-					+ ",维度id='"+quotaType.getQuotaDimension().getId()+"'"
-					+ ",维度='"+quotaType.getQuotaDimension().getName()+"'"
-					+",完成值=''"
-					+",累计值=''"
-					+",去年同期值=''"
-					+",去年同期累计值=''"
-					+",初次填报时间=''"
-					+",最后更新时间=''"
-					+",填报人=''"
-					+",异动原因=''"
-					+",提交状态="+quotaItem.isAllowSubmit()
-					+",填报超时="+quotaItem.isOverTime();
-		}else {
-			staticSetString="指标名称='"+quotaType.getName()+"'"
-					+ ",指标专业='"+quotaType.getQuotaProfession().getName()+"'"
-					+ ",指标级别='"+quotaType.getQuotaLevel().getName()+"'"
-					+ ",计量单位='"+quotaType.getQuotaUnit().getName()+"'"
-					+ ",小数位数="+quotaType.getDigit()
-					+ ",管理部门id='"+quotaType.getManageDept().getId()+"'"
-					+ ",管理部门='"+quotaType.getManageDept().getName()+"'"
-					+ ",责任部门id='"+quotaItemCreator.getQuotaDutyDept().getId()+"'"
-					+ ",责任部门='"+quotaItemCreator.getQuotaDutyDept().getName()+"'"
-					+ ",口径id='"+quotaItemCreator.getQuotaCover().getId()+"'"
-					+ ",口径='"+quotaItemCreator.getQuotaCover().getName()+"'"
-					+ ",维度id='"+quotaType.getQuotaDimension().getId()+"'"
-					+ ",维度='"+quotaType.getQuotaDimension().getName()+"'"
-					+",完成值="+quotaItem.getFinishValue()
-					+",累计值="+quotaItem.getAccumulateValue()
-					+",去年同期值="+quotaItem.getSameTermValue()
-					+",去年同期累计值="+quotaItem.getSameTermAccumulateValue()
-					+",初次填报时间='"+firstSubmitTime+"'"
-					+",最后更新时间='"+lastSubmitTime+"'"
-					+",填报人='"+usernameOfLastSubmit+"'"
-					+",异动原因='"+redLightReason+"'"
-					+",提交状态="+quotaItem.isAllowSubmit()
-					+",填报超时="+quotaItem.isOverTime();
-		}
-
-		String dynamicSetString="";
-		//更新计算结果
-		Collection<QuotaFormulaResultValue> quotaFormulaResultValues=quotaFormulaResultValueDao.getQuotaFormulaResultValuesByQuotaItem(quotaItem.getId());
-		for (QuotaFormulaResultValue quotaFormulaResultValue : quotaFormulaResultValues) {
-			if (quotaItem.isAllowSubmit()==false) {
-				//未提交指标计算结果设为#
-				dynamicSetString=dynamicSetString+","+quotaFormulaResultValue.getQuotaFormulaResult().getName()
-						+"='#'";
-			}else {
-				dynamicSetString=dynamicSetString+","+quotaFormulaResultValue.getQuotaFormulaResult().getName()
-						+"="+quotaFormulaResultValue.getValue();
-			}
-		}
-		//更新月度目标值
-		Collection<QuotaTargetValue> quotaTargetValues=quotaTargetValueDao.getQuotaTargetValuesByQuotaItem(quotaItem.getId());
-		for (QuotaTargetValue quotaTargetValue : quotaTargetValues) {
-			dynamicSetString=dynamicSetString+","+quotaTargetValue.getQuotaProperty().getName()+"_月度"
-					+"="+quotaTargetValue.getValue();
-		}
-		//更新年度目标值
-		Collection<QuotaPropertyValue> quotaPropertyValues=quotaPropertyValueDao.getQuotaPropertyValuesByQuotaItemCreator(quotaItem.getQuotaItemCreator().getId());
-		for (QuotaPropertyValue quotaPropertyValue : quotaPropertyValues) {
-			dynamicSetString=dynamicSetString+","+quotaPropertyValue.getQuotaProperty().getName()
-					+"="+quotaPropertyValue.getValue();
-		}
-		
-		String updateString="UPDATE "+tableName+" SET "+staticSetString+dynamicSetString+" WHERE 指标id='"+quotaItem.getId()+"'";
-		
-		return updateString;
 	}
 	
 	public String getInsertQuotaItemValuesIntoTableString(QuotaItem quotaItem,String tableName){
@@ -396,10 +282,10 @@ public class ResultTableCreator extends HibernateDao{
 				for (QuotaPropertyValue quotaPropertyValue : quotaPropertyValues) {
 					if (dynamicColumnsString=="") {
 						dynamicColumnsString=quotaPropertyValue.getQuotaProperty().getName();
-						dynamicValuesString=quotaPropertyValue.getValue()+"";
+						dynamicValuesString="'"+quotaPropertyValue.getValue()+"'";
 					}else {
 						dynamicColumnsString=dynamicColumnsString+","+quotaPropertyValue.getQuotaProperty().getName();
-						dynamicValuesString=dynamicValuesString+","+quotaPropertyValue.getValue();
+						dynamicValuesString=dynamicValuesString+","+"'"+quotaPropertyValue.getValue()+"'";
 					}
 				}
 			}
@@ -408,10 +294,10 @@ public class ResultTableCreator extends HibernateDao{
 				for (QuotaTargetValue quotaTargetValue : quotaTargetValues) {
 					if (dynamicColumnsString=="") {
 						dynamicColumnsString=quotaTargetValue.getQuotaProperty().getName()+"_月度";
-						dynamicValuesString=quotaTargetValue.getValue()+"";
+						dynamicValuesString="'"+quotaTargetValue.getValue()+"'";
 					}else {
 						dynamicColumnsString=dynamicColumnsString+","+quotaTargetValue.getQuotaProperty().getName()+"_月度";
-						dynamicValuesString=dynamicValuesString+","+quotaTargetValue.getValue();
+						dynamicValuesString=dynamicValuesString+","+"'"+quotaTargetValue.getValue()+"'";
 					}
 				}
 			}
@@ -425,7 +311,7 @@ public class ResultTableCreator extends HibernateDao{
 							//未提交指标计算结果设为#
 							dynamicValuesString="'#'";
 						} else {
-							dynamicValuesString=quotaFormulaResultValue.getValue();
+							dynamicValuesString="'"+quotaFormulaResultValue.getValue()+"'";
 						}	
 					}else {
 						dynamicColumnsString=dynamicColumnsString+","+quotaFormulaResultValue.getQuotaFormulaResult().getName();
@@ -433,7 +319,7 @@ public class ResultTableCreator extends HibernateDao{
 							//未提交指标计算结果设为#
 							dynamicValuesString=dynamicValuesString+",'#'";
 						} else {
-							dynamicValuesString=dynamicValuesString+","+quotaFormulaResultValue.getValue();
+							dynamicValuesString=dynamicValuesString+","+"'"+quotaFormulaResultValue.getValue()+"'";
 						}
 					}
 				}
@@ -545,7 +431,7 @@ public class ResultTableCreator extends HibernateDao{
 		String driver = "com.mysql.jdbc.Driver";
 		String url = "jdbc:mysql://localhost:3306/quotamanagesysdb?useUnicode=true&amp;characterEncoding=UTF-8";
 		String user = "root"; 
-		String password = "abcd1234";
+		String password = "scmis@*08";
 		try { 
 			Class.forName(driver);
 			Connection conn = DriverManager.getConnection(url, user, password);
