@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DbModel>
+  <Table name="push_value_to_pmis" nativeTable="push_value_to_pmis">
+    <Property name="remarks"></Property>
+    <Property name="meta">
+      <Property name="dataSource">mysql</Property>
+      <Property name="tableName">push_value_to_pmis</Property>
+      <Property name="namespace">quotamanagesysdb</Property>
+    </Property>
+    <Columns>
+      <Column name="指标类别">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="考核年度">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="考核月度">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="指标名称">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="指标口径">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="指标单位">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="完成值">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="基准值">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="满分值">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="指标归口管理部门">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="责任部门">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="权重">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="计算公式">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="公式编码">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="导入情况监控">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="指标得分">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="指标属性">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="年度目标值">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="remarks"></Property>
+      </Column>
+    </Columns>
+  </Table>
+  <CompositeTable name="cpt_push_value_to_pmis">
+    <Columns>
+      <Column name="指标类别">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="table">push_value_to_pmis</Property>
+        <Property name="column">指标类别</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="考核年度">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="table">push_value_to_pmis</Property>
+        <Property name="column">考核年度</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="考核月度">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="table">push_value_to_pmis</Property>
+        <Property name="column">考核月度</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="指标名称">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="table">push_value_to_pmis</Property>
+        <Property name="column">指标名称</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="指标口径">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="table">push_value_to_pmis</Property>
+        <Property name="column">指标口径</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="指标单位">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="table">push_value_to_pmis</Property>
+        <Property name="column">指标单位</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="完成值">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="table">push_value_to_pmis</Property>
+        <Property name="column">完成值</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="基准值">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="table">push_value_to_pmis</Property>
+        <Property name="column">基准值</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="满分值">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="table">push_value_to_pmis</Property>
+        <Property name="column">满分值</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="指标归口管理部门">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="table">push_value_to_pmis</Property>
+        <Property name="column">指标归口管理部门</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="责任部门">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="table">push_value_to_pmis</Property>
+        <Property name="column">责任部门</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="权重">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="table">push_value_to_pmis</Property>
+        <Property name="column">权重</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="计算公式">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="table">push_value_to_pmis</Property>
+        <Property name="column">计算公式</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="公式编码">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="table">push_value_to_pmis</Property>
+        <Property name="column">公式编码</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="导入情况监控">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="table">push_value_to_pmis</Property>
+        <Property name="column">导入情况监控</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="指标得分">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="table">push_value_to_pmis</Property>
+        <Property name="column">指标得分</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="指标属性">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="table">push_value_to_pmis</Property>
+        <Property name="column">指标属性</Property>
+        <Property name="remarks"></Property>
+      </Column>
+      <Column name="年度目标值">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="table">push_value_to_pmis</Property>
+        <Property name="column">年度目标值</Property>
+        <Property name="remarks"></Property>
+      </Column>
+    </Columns>
+    <Conditions>
+      <Base name="base1">
+        <Property name="jdbcType">VARCHAR-String</Property>
+        <Property name="column">导入情况监控</Property>
+        <Property name="value">:importStatus</Property>
+        <Property name="table">push_value_to_pmis</Property>
+      </Base>
+    </Conditions>
+    <GroupBys/>
+    <Joins/>
+    <OrderBys/>
+    <Tables>
+      <FromTable name="push_value_to_pmis">
+        <Property name="referenceTable">push_value_to_pmis</Property>
+        <Property name="meta">
+          <Property name="jdbc.resource">models/Tables.dbm.xml</Property>
+        </Property>
+      </FromTable>
+    </Tables>
+  </CompositeTable>
+</DbModel>

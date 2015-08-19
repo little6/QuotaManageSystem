@@ -3,12 +3,76 @@
   <Arguments/>
   <Context/>
   <Model>
-    <DataType name="dataType1"/>
-    <DataProvider name="dataProvider1" type="direct"/>
+    <DataType name="PushValueToPmis">
+      <Property name="metaData">
+        <Property name="jdbc.model">cpt_push_value_to_pmis</Property>
+      </Property>
+      <Property name="meta">
+        <Property name="jdbc.resource">models/Tables.dbm.xml</Property>
+      </Property>
+      <PropertyDef name="指标类别">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="考核年度">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="考核月度">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="指标名称">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="指标口径">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="指标单位">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="完成值">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="基准值">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="满分值">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="指标归口管理部门">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="责任部门">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="权重">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="计算公式">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="公式编码">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="导入情况监控">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="指标得分">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="指标属性">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+      <PropertyDef name="年度目标值">
+        <Property name="dataType">String</Property>
+      </PropertyDef>
+    </DataType>
   </Model>
   <View>
     <Container>
       <ToolBar>
+        <DataPilot>
+          <Property name="dataSet">dsPushValueToPmis</Property>
+          <Property name="itemCodes">pages</Property>
+        </DataPilot>
         <ToolBarButton>
           <Property name="action">aaPushValueToPmis</Property>
           <Property name="caption">绩效数据联通</Property>
@@ -17,6 +81,15 @@
       <AjaxAction id="aaPushValueToPmis">
         <Property name="service">pushValueToPmis#pushValues</Property>
       </AjaxAction>
+      <DataGrid id="dgPushValueToPmis">
+        <Property name="dataSet">dsPushValueToPmis</Property>
+        <Property name="filterMode">serverSide</Property>
+      </DataGrid>
     </Container>
+    <DataSet id="dsPushValueToPmis">
+      <Property name="dataType">[PushValueToPmis]</Property>
+      <Property name="dataProvider">pushValueToPmisDao#pagePushValueToPmisIsWrong</Property>
+      <Property name="pageSize">50</Property>
+    </DataSet>
   </View>
 </ViewConfig>

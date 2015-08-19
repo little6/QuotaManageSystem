@@ -138,7 +138,7 @@ public class WriteExcel extends HibernateDao{
 										cellStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);//上边框    
 										cellStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);//右边框  
 										row.getCell(11).setCellStyle(cellStyle);
-										row.getCell(11).setCellValue("●");
+										row.getCell(11).setCellValue("■");
 									} else if (gskhjk.equals("1.0")) {
 										HSSFFont font=workbook.createFont();
 							            font.setColor(HSSFColor.BRIGHT_GREEN.index);//HSSFColor.VIOLET.index //字体颜色
@@ -183,6 +183,16 @@ public class WriteExcel extends HibernateDao{
 				isSuccess=false;
 			}
 		}
+		
+		String fileName0="C:\\DC_\\print_for_leader1.xls";
+		File file0=new File(fileName0);
+		if (file0.exists()) {
+			file0.delete();
+		}
+		FileOutputStream fileOutputStream0=new FileOutputStream(fileName0);
+		workbook.write(fileOutputStream0);
+		fileOutputStream0.flush();
+		fileOutputStream0.close();
 		
 		String fileName2="C:\\DC_\\"+URLEncoder.encode("河池供电局"+year+"年"+month+"月关键业绩考核指标完成情况表", "UTF-8")+".xls";
 		File file2=new File(fileName2);

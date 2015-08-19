@@ -107,6 +107,12 @@
 			<artifactId>dorado-portal</artifactId>
 			<version>0.1.9-BETA</version>
 		</dependency>
+		<dependency>
+			<groupId>com.bstek.dorado</groupId>
+			<artifactId>dorado-jdbc</artifactId>
+			<version>1.4.11</version>
+		</dependency>
+
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

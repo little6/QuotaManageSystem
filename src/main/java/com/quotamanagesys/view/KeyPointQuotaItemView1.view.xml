@@ -205,14 +205,15 @@ aaDownLoadFile.execute();</ClientEvent>
     alert(&quot;ActiveX&quot;);   &#xD;
     return;   &#xD;
   }   &#xD;
-     &#xD;
-  var xlBook = xlApp.Workbooks.open(&quot;http://10.195.54.57:8080/t1/FileDownload2&quot;);&#xD;
+  &#xD;
+  var xlBook = xlApp.Workbooks.open(&quot;http://10.195.49.168:8080/t1/FileDownload2&quot;);   &#xD;
+  //var xlBook = xlApp.Workbooks.open(&quot;http://localhost:8080/t1/FileDownload2&quot;);&#xD;
   var xlSheet = xlBook.Worksheets(1);       &#xD;
     &#xD;
   xlBook.Worksheets(1).Activate;   &#xD;
   xlApp.visible = true;&#xD;
   xlSheet.PrintPreview;&#xD;
-  xlSheet.SetPage(2);&#xD;
+  xlSheet.PageSetup.Orientation=2;&#xD;
   xlBook.Close(false);&#xD;
   xlApp.Quit();   &#xD;
   xlApp = null;   &#xD;
@@ -221,7 +222,7 @@ aaDownLoadFile.execute();</ClientEvent>
 xlPrint();</ClientEvent>
         <Property name="caption">打印</Property>
         <Property name="visible">true</Property>
-        <Property name="icon">url(>skin>common/icons.gif) -140px -240px</Property>
+        <Property name="icon">url(>skin>common/icons.gif) -120px -20px</Property>
       </ToolBarButton>
     </ToolBar>
     <HtmlContainer id="hc1" listener="spring:keyPointQuotaItemViewInit#Hc1Init">
